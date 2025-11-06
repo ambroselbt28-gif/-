@@ -459,22 +459,44 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         async sendToTavern(prompt, userInput) {
-            // 检查是否在iframe中
-            const inIframe = window.parent !== window;
+            // 调试信息：检查可用的API
+            console.log('[酒馆检测] 在iframe中:', window.parent !== window);
+            console.log('[酒馆检测] typeof TavernHelper:', typeof TavernHelper);
+            console.log('[酒馆检测] typeof window.TavernHelper:', typeof window.TavernHelper);
+            console.log('[酒馆检测] typeof parent.TavernHelper:', typeof parent?.TavernHelper);
 
-            // 调试信息
-            console.log('[酒馆检测] 在iframe中:', inIframe);
-            console.log('[酒馆检测] window.parent可访问:', window.parent !== null);
-
-            if (inIframe) {
-                // 在iframe中，使用postMessage与酒馆通信
-                this.logMessage('system', '✓ 检测到iframe环境，使用postMessage通信');
-                await this.sendViaPostMessage(prompt, userInput);
-            } else {
-                // 独立运行模式，模拟AI回复
-                this.logMessage('system', '⚠ 独立运行模式，使用模拟AI');
-                this.simulateAIResponse(userInput);
+            // 尝试方法1：直接使用TavernHelper.generate（归墟Plus的方式）
+            if (typeof TavernHelper !== 'undefined' && TavernHelper.generate) {
+                this.logMessage('system', '✓ 检测到TavernHelper API，使用直接通信');
+                await this.sendViaTavernHelper(prompt, userInput);
+                return;
             }
+
+            // 尝试方法2：从window获取
+            if (typeof window.TavernHelper !== 'undefined' && window.TavernHelper?.generate) {
+                this.logMessage('system', '✓ 从window获取TavernHelper');
+                window.TavernHelper = TavernHelper; // 设置全局引用
+                await this.sendViaTavernHelper(prompt, userInput);
+                return;
+            }
+
+            // 尝试方法3：从parent获取（iframe环境）
+            if (window.parent !== window) {
+                try {
+                    if (typeof parent.TavernHelper !== 'undefined' && parent.TavernHelper?.generate) {
+                        this.logMessage('system', '✓ 从父窗口获取TavernHelper');
+                        window.TavernHelper = parent.TavernHelper; // 复制引用
+                        await this.sendViaTavernHelper(prompt, userInput);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn('[酒馆检测] 无法访问父窗口TavernHelper:', e);
+                }
+            }
+
+            // 所有方法都失败，降级到模拟模式
+            this.logMessage('system', '⚠ 未找到TavernHelper API，使用模拟模式');
+            this.simulateAIResponse(userInput);
         },
 
         async sendViaTavernHelper(prompt, userInput) {
