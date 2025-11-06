@@ -12,11 +12,29 @@
 
 ## 快速开始
 
-### 独立使用
+### 方式一：本地安装到 SillyTavern（推荐）
+
+**适用于**: 需要与 AI 实时交互的完整游戏体验
+
+1. 运行 `准备安装包.bat` 生成安装包
+2. 将生成的 `villain-game-install` 文件夹复制到 SillyTavern 的 `public` 目录
+3. 重命名为 `villain-game`
+4. 按照 `本地安装指南.md` 配置 iframe 和 AI 提示词
+5. 开始游戏！
+
+**优势**:
+- ✅ 无跨域限制,直接访问 TavernHelper API
+- ✅ 与 AI 实时交互
+- ✅ 游戏状态自动同步
+- ✅ 完全离线运行
+
+### 方式二：独立浏览器模式
+
+**适用于**: 仅查看游戏界面和基础功能测试
 
 1. 直接在浏览器中打开 `index.html`
-2. 确保 YAML 配置文件路径正确（默认为 `../反派逆袭系统指南.yaml`）
-3. 开始游戏！
+2. 游戏会自动运行在模拟模式
+3. 可以查看界面和测试基础功能（无AI交互）
 
 ### 系统指令
 
@@ -30,52 +48,72 @@
 
 ## 与酒馆集成使用
 
-### 部署到 GitHub Pages
+### 推荐方式：本地安装（无跨域限制）
 
-1. 将整个 `反派逆袭系统指南-app` 文件夹推送到 GitHub 仓库
-2. 在仓库设置中启用 GitHub Pages
-3. 记录你的应用 URL，例如：`https://你的用户名.github.io/你的仓库名/反派逆袭系统指南-app/`
+**为什么推荐本地安装？**
 
-### 在酒馆中配置
+由于浏览器的跨域安全限制(CORS),从 GitHub Pages 加载的 iframe 无法访问 SillyTavern 的 TavernHelper API。本地安装可以完全避免这个问题。
 
-#### 方法一：使用 HTML 内容注入（推荐）
+**安装步骤**：
 
-在酒馆的人物卡中添加以下内容：
-
-```html
-<div id="game-container"></div>
-<script>
-$(document).ready(function() {
-    $('#game-container').load('https://你的GitHub-Pages-URL/index.html');
-});
-</script>
-```
-
-#### 方法二：使用 iframe 嵌入
+1. 运行 `准备安装包.bat` 生成安装包
+2. 将 `villain-game-install` 文件夹复制到 `SillyTavern/public/` 目录下
+3. 重命名为 `villain-game`
+4. 在世界书或角色卡中添加 iframe:
 
 ```html
 <iframe
-    src="https://你的GitHub-Pages-URL/index.html"
-    style="width: 100%; height: 800px; border: none;"
-    id="villain-game-frame">
+    id="villain-game-frame"
+    src="/villain-game/index.html"
+    allow="clipboard-write"
+    style="position: fixed; top: 20px; right: 20px; width: 1200px; height: 800px; border: 2px solid #f0e68c; border-radius: 15px; z-index: 9999; box-shadow: 0 8px 32px rgba(0,0,0,0.7);">
 </iframe>
 ```
 
-### 配置正则替换规则
+### 备用方式：GitHub Pages（仅展示用途）
 
-在酒馆的"世界书"或"高级设置"中添加正则替换规则，使AI能够进行状态更新：
+**注意**: 此方式受跨域限制影响,无法与 AI 实时交互,仅适合展示游戏界面。
 
-**正则模式：**
-```regex
-\{\{state_update::(.+?)=(.+?)\}\}
+1. 将代码推送到 GitHub 仓库
+2. 在仓库设置中启用 GitHub Pages
+3. 在酒馆中使用 iframe 嵌入:
+
+```html
+<iframe
+    src="https://你的用户名.github.io/你的仓库名/index.html"
+    style="position: fixed; top: 20px; right: 20px; width: 1200px; height: 800px; border: 2px solid #f0e68c; border-radius: 15px; z-index: 9999;">
+</iframe>
 ```
 
-**替换为：**
+**限制**: 游戏会自动降级到模拟模式,无法访问 TavernHelper API。
+
+### 配置 AI 提示词
+
+在角色卡的**系统提示词**或**作者注释**中添加:
+
 ```
-[状态已更新]
+你是"反派逆袭系统指南"游戏的AI主持人。
+
+# 游戏状态更新规则
+当玩家的行动导致游戏状态变化时,请在你的回复末尾使用以下格式:
+
+{{state_update::变量名=新值}}
+
+# 可更新的变量
+- 玩家.反派值 - 数字
+- 玩家.境界 - 字符串
+- 女性角色.角色名.好感度 - 数字(-100到100)
+- 女性角色.角色名.身体状态 - 字符串
+- 女性角色.角色名.心理状态 - 字符串
 ```
 
-或者保持原样，让应用内的 JavaScript 自动处理。
+### 配置正则替换（可选）
+
+在 SillyTavern 的**扩展** > **正则替换**中添加:
+
+**查找正则**: `\{\{state_update::[^}]+\}\}`
+**替换为**: (留空)
+**选项**: 启用,仅输出
 
 ## AI 交互机制
 
