@@ -28,7 +28,7 @@
     "entries": [
       {
         "keys": ["游戏界面", "反派系统", "状态", "界面"],
-        "content": "<iframe id=\"villain-game-frame\" src=\"https://villain-game.pages.dev/index.html\" allow=\"clipboard-write\" sandbox=\"allow-scripts allow-same-origin\" style=\"position: fixed; top: 20px; right: 20px; width: 1200px; height: 800px; border: 2px solid #f0e68c; border-radius: 15px; z-index: 9999; box-shadow: 0 8px 32px rgba(0,0,0,0.7);\"></iframe>",
+        "content": "<iframe id=\"villain-game-frame\" src=\"https://code-e13.pages.dev/index.html\" allow=\"clipboard-write\" sandbox=\"allow-scripts allow-same-origin\" style=\"position: fixed; top: 20px; right: 20px; width: 1200px; height: 800px; border: 2px solid #f0e68c; border-radius: 15px; z-index: 9999; box-shadow: 0 8px 32px rgba(0,0,0,0.7);\"></iframe>",
         "extensions": {
           "position": "after_char",
           "exclude_recursion": false,
