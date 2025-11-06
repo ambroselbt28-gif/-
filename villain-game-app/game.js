@@ -459,16 +459,74 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         async sendToTavern(prompt, userInput) {
-            // 检查是否在酒馆环境中
-            if (typeof window !== 'undefined' && window.parent !== window) {
-                // 在 iframe 中，尝试使用 postMessage 与酒馆通信
-                this.sendViaPostMessage(prompt, userInput);
+            // 检查是否在酒馆环境中且有TavernHelper API
+            const isInTavern = typeof window !== 'undefined' &&
+                             window.parent !== window &&
+                             typeof TavernHelper !== 'undefined';
+
+            if (isInTavern) {
+                // 使用TavernHelper API与酒馆通信
+                await this.sendViaTavernHelper(prompt, userInput);
             } else {
                 // 独立运行模式，模拟AI回复
                 this.simulateAIResponse(userInput);
             }
         },
 
+        async sendViaTavernHelper(prompt, userInput) {
+            try {
+                this.logMessage('system', '正在向AI发送请求...');
+
+                // 构建AI生成配置
+                const generateConfig = {
+                    injects: [{
+                        role: 'user',
+                        content: prompt,
+                        position: 'in_chat',
+                        should_scan: true
+                    }],
+                    should_stream: false
+                };
+
+                // 调用TavernHelper.generate发送到AI
+                const aiResponse = await TavernHelper.generate(generateConfig);
+
+                // 处理AI回复
+                await this.processAIResponse(aiResponse);
+
+                // 将游戏状态同步到消息数据中（同层游玩机制）
+                await this.syncStateToMessages(aiResponse);
+
+            } catch (error) {
+                console.error('TavernHelper通信失败:', error);
+                this.logMessage('system', `错误: AI通信失败 - ${error.message}`);
+                // 降级到模拟模式
+                this.simulateAIResponse(userInput);
+            }
+        },
+
+        async syncStateToMessages(aiResponse) {
+            try {
+                // 获取第0层消息（同层游玩的状态存储层）
+                const messages = await TavernHelper.getChatMessages('0');
+                if (messages && messages.length > 0) {
+                    const messageZero = messages[0];
+                    messageZero.message = aiResponse; // AI回复文本
+                    messageZero.data = {
+                        game_state: this.state,
+                        timestamp: new Date().toISOString()
+                    };
+
+                    // 静默更新，不刷新界面
+                    await TavernHelper.setChatMessages([messageZero], { refresh: 'none' });
+                    console.log('[同层游玩] 游戏状态已同步到消息层');
+                }
+            } catch (error) {
+                console.error('[同层游玩] 状态同步失败:', error);
+            }
+        },
+
+        // 旧的postMessage方法保留作为备用
         sendViaPostMessage(prompt, userInput) {
             const message = {
                 type: 'TAVERN_GAME_ACTION',
