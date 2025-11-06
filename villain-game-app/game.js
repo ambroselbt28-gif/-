@@ -459,15 +459,27 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         async sendToTavern(prompt, userInput) {
+            // 调试信息：检查环境
+            console.log('[酒馆检测] window.parent !== window:', window.parent !== window);
+            console.log('[酒馆检测] typeof TavernHelper:', typeof TavernHelper);
+            console.log('[酒馆检测] typeof SillyTavern:', typeof SillyTavern);
+            console.log('[酒馆检测] window对象:', window);
+
             // 检查是否在酒馆环境中且有TavernHelper API
             const isInTavern = typeof window !== 'undefined' &&
                              window.parent !== window &&
-                             typeof TavernHelper !== 'undefined';
+                             (typeof TavernHelper !== 'undefined' || typeof SillyTavern !== 'undefined');
 
             if (isInTavern) {
+                this.logMessage('system', '✓ 检测到酒馆环境，使用真实AI通信');
                 // 使用TavernHelper API与酒馆通信
                 await this.sendViaTavernHelper(prompt, userInput);
             } else {
+                this.logMessage('system', '⚠ 未检测到酒馆环境，使用模拟模式');
+                console.log('[酒馆检测] 进入模拟模式的原因:');
+                console.log('  - 在iframe中:', window.parent !== window);
+                console.log('  - TavernHelper可用:', typeof TavernHelper !== 'undefined');
+                console.log('  - SillyTavern可用:', typeof SillyTavern !== 'undefined');
                 // 独立运行模式，模拟AI回复
                 this.simulateAIResponse(userInput);
             }
@@ -475,7 +487,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         async sendViaTavernHelper(prompt, userInput) {
             try {
+                // 检查TavernHelper是否存在
+                if (typeof TavernHelper === 'undefined') {
+                    throw new Error('TavernHelper API未找到');
+                }
+
                 this.logMessage('system', '正在向AI发送请求...');
+                console.log('[TavernHelper] 发送提示词:', prompt.substring(0, 100) + '...');
 
                 // 构建AI生成配置
                 const generateConfig = {
@@ -488,8 +506,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     should_stream: false
                 };
 
+                console.log('[TavernHelper] 调用 TavernHelper.generate...');
                 // 调用TavernHelper.generate发送到AI
                 const aiResponse = await TavernHelper.generate(generateConfig);
+                console.log('[TavernHelper] 收到AI回复:', aiResponse?.substring(0, 100) + '...');
 
                 // 处理AI回复
                 await this.processAIResponse(aiResponse);
@@ -498,8 +518,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 await this.syncStateToMessages(aiResponse);
 
             } catch (error) {
-                console.error('TavernHelper通信失败:', error);
+                console.error('[TavernHelper] 通信失败:', error);
                 this.logMessage('system', `错误: AI通信失败 - ${error.message}`);
+                this.logMessage('system', '正在降级到模拟模式...');
                 // 降级到模拟模式
                 this.simulateAIResponse(userInput);
             }
