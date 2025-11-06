@@ -1,0 +1,60 @@
+# 变量更新规则高级概述
+
+# 本文件旨在提供变量更新的核心逻辑和动态规则。
+# 详细的静态规则（如类型、范围）已合并入 '变量初始化_new.xyaml' 的描述中，以便于AI直接查阅。
+
+# --- 核心动态规则：女性角色关系阶段 ---
+# AI行动指令:
+# 1. **阶段演绎**: 在你的回复中，角色的【行为和对话必须鲜明地体现出推断出的“应处阶段名称”】。
+# 2. **变量更新**: 在回复末尾的 <UpdateVariable> 块中，如果“推断阶段名称”与角色当前的“与主角关系”不同，则【必须】使用 _.set() 来更新该变量。
+
+<%
+// EJS脚本，用于动态计算和展示女性角色的关系阶段
+// AI需要基于此处的“推断阶段”来演绎角色行为，并在必要时更新'与主角关系'变量。
+
+const statData = getvar("stat_data");
+let output = `---
+[女性角色关系阶段推断]
+AI请注意：你需要根据每个角色的好感度，参考以下逻辑来判断并演绎她们的行为。
+---
+`;
+
+if (statData && statData.女性角色) {
+    for (const charName in statData.女性角色) {
+        if (Object.hasOwnProperty.call(statData.女性角色, charName)) {
+            const charData = statData.女性角色[charName];
+            const 好感度 = Array.isArray(charData.好感度) ? parseInt(charData.好感度[0], 10) : (typeof charData.好感度 === 'number' ? charData.好感度 : NaN);
+            const 当前关系 = Array.isArray(charData.与主角关系) ? String(charData.与主角关系[0]) : String(charData.与主角关系);
+
+            if (!isNaN(好感度)) {
+                let 推断阶段名称 = "未知";
+                if (好感度 >= 95) {
+                    推断阶段名称 = "死心塌地";
+                } else if (好感度 >= 80) {
+                    推断阶段名称 = "芳心暗许";
+                } else if (好感度 >= 60) {
+                    推断阶段名称 = "暧昧升温";
+                } else if (好感度 >= 40) {
+                    推断阶段名称 = "颇具好感";
+                } else if (好感度 >= 20) {
+                    推断阶段名称 = "朋友";
+                } else if (好感度 >= 0) {
+                    推断阶段名称 = "陌生人";
+                } else if (好感度 > -40) {
+                    推断阶段名称 = "心怀芥蒂";
+                } else {
+                    推断阶段名称 = "仇视";
+                }
+                
+                output += `
+角色: 【${charName}】
+  - 当前记录的关系: 【${当前关系}】
+  - 基于当前好感度 (${好感度}) 的推断:
+    应处阶段名称: 【${推断阶段名称}】
+---`;
+            }
+        }
+    }
+}
+%>
+<%= output %>
