@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>时空状态</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #f8f9fa;
+            --text-color: #2c3e50;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            padding: 20px;
+        }
+        
+        .status-card {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px var(--shadow-color);
+            overflow: hidden;
+        }
+        
+        .card-content {
+            padding: 25px;
+        }
+        
+        .detail-section {
+            margin-bottom: 20px;
+        }
+
+        .detail-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .detail-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+        
+        .detail-title i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+            width: 20px; /* 确保图标宽度一致 */
+            text-align: center;
+        }
+        
+        .detail-content {
+            background-color: var(--secondary-color);
+            padding: 12px 15px;
+            border-radius: 8px;
+            line-height: 1.6;
+            font-size: 1rem;
+            color: #34495e;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="status-card">
+        <div class="card-content">
+            <div class="detail-section">
+                <div class="detail-title">
+                    <i class="fas fa-clock"></i>
+                    <span>当前时间</span>
+                </div>
+                <div class="detail-content">
+                    2025年10月30日 星期四, 下午 3:45
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <div class="detail-title">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>当前地点</span>
+                </div>
+                <div class="detail-content">
+                    市中心，星光大道旁的“此刻”咖啡馆
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

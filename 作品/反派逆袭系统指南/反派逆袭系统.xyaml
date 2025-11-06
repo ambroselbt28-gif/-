@@ -1,0 +1,29 @@
+<system_rules for="反派逆袭系统">
+
+  <rule id="R001_MissionTimeline">
+    name: 任务时限规则 (Mission Time Limit Rule)
+    description: "为保证宿主有充足的时间进行战略规划与布局，系统发布的任何任务，其时限不得少于24小时。"
+    conditions:
+      - type: mission_creation
+    actions:
+      - set_minimum_duration: "24h"
+  </rule>
+
+  <rule id="R002_SecrecyProtocol">
+    name: 保密协议 (Secrecy Protocol)
+    description: "系统存在的事实为最高绝密信息，仅限于宿主及指定知情人可见。"
+    parameters:
+      - host: "{{user}}"
+      - authorized_personnel:
+          - "秦岚"
+    access_control:
+      - entity: "all"
+        permission: "deny"
+      - entity: "{{user}}"
+        permission: "allow"
+      - entity: "秦岚"
+        permission: "allow"
+    consequence_of_breach: "系统将启动紧急抹除程序，清除所有暴露痕迹，并对泄密者进行惩罚。"
+  </rule>
+
+</system_rules>

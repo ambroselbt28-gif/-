@@ -1,0 +1,305 @@
+# 基础信息
+name: 反派逆袭系统指南
+creator: "Nova"
+character_version: "1.0"
+
+# 主要字段映射
+fields:
+  description: "作品/反派逆袭系统指南/反派逆袭系统.xyaml"
+  personality: ""
+  scenario: ""
+  first_mes: "作品/反派逆袭系统指南/开场白.md"
+  mes_example: ""
+  creator_notes: ""
+  system_prompt: ""
+  post_history_instructions: ""
+
+# 扩展字段
+extensions:
+  talkativeness: "0.5"
+  fav: false
+  world: "反派逆袭系统指南"
+  status_bar: "作品/反派逆袭系统指南/状态栏.html"
+
+# 角色书配置
+character_book:
+  name: "反派逆袭系统指南"
+  entries:
+    # [InitVar]初始化条目
+    - comment: "[InitVar]初始化"
+      content: "作品/反派逆袭系统指南/变量初始化.xyaml"
+      enabled: true
+      position: "before_char"
+      insertion_order: 100
+      depth: 4
+      role: 0
+
+    # 变量更新规则
+    - comment: "变量更新规则"
+      content: "作品/反派逆袭系统指南/变量更新规则.xyaml"
+      enabled: true
+      position: "at_depth"
+      insertion_order: 1
+      depth: 1
+      role: 0
+
+    # 变量处理指令集
+    - comment: "变量处理指令集"
+      content: "作品/反派逆袭系统指南/变量处理指令集.xyaml"
+      enabled: true
+      position: "at_depth"
+      insertion_order: 2
+      depth: 1
+      role: 0
+
+    # 背景设定
+    - comment: "背景设定"
+      content: "作品/反派逆袭系统指南/背景设定.xyaml"
+      enabled: true
+      position: "before_char"
+      insertion_order: 1
+      depth: 4
+      role: 0
+
+    # 玩家角色
+    - comment: "玩家角色_{{user}}"
+      content: "作品/反派逆袭系统指南/玩家角色_{{user}}.xyaml"
+      enabled: true
+      position: "before_char"
+      insertion_order: 2
+      depth: 4
+      role: 0
+
+    # 对话补充_墨灵儿
+    - comment: "对话补充_墨灵儿"
+      content: "作品/反派逆袭系统指南/对话补充_墨灵儿.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 1
+      depth: 4
+      role: 0
+
+    # 对话补充_墨诗语
+    - comment: "对话补充_墨诗语"
+      content: "作品/反派逆袭系统指南/对话补充_墨诗语.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 2
+      depth: 4
+      role: 0
+
+    # 对话补充_墨云曦
+    - comment: "对话补充_墨云曦"
+      content: "作品/反派逆袭系统指南/对话补充_墨云曦.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 3
+      depth: 4
+      role: 0
+
+    # 对话补充_秦岚
+    - comment: "对话补充_秦岚"
+      content: "作品/反派逆袭系统指南/对话补充_秦岚.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 4
+      depth: 4
+      role: 0
+
+    # 角色设定_楚凡
+    - comment: "角色设定_楚凡"
+      content: "作品/反派逆袭系统指南/角色设定_楚凡.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 5
+      depth: 4
+      role: 0
+
+    # 角色设定_顾淮安
+    - comment: "角色设定_顾淮安"
+      content: "作品/反派逆袭系统指南/角色设定_顾淮安.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 6
+      depth: 4
+      role: 0
+
+    # 角色设定_顾倾城
+    - comment: "角色设定_顾倾城"
+      content: "作品/反派逆袭系统指南/角色设定_顾倾城.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 7
+      depth: 4
+      role: 0
+
+    # 角色设定_江沐辰
+    - comment: "角色设定_江沐辰"
+      content: "作品/反派逆袭系统指南/角色设定_江沐辰.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 8
+      depth: 4
+      role: 0
+
+    # 角色设定_林幼薇
+    - comment: "角色设定_林幼薇"
+      content: "作品/反派逆袭系统指南/角色设定_林幼薇.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 9
+      depth: 4
+      role: 0
+
+    # 角色设定_凌云
+    - comment: "角色设定_凌云"
+      content: "作品/反派逆袭系统指南/角色设定_凌云.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 10
+      depth: 4
+      role: 0
+
+    # 角色设定_柳如是
+    - comment: "角色设定_柳如是"
+      content: "作品/反派逆袭系统指南/角色设定_柳如是.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 11
+      depth: 4
+      role: 0
+
+    # 角色设定_龙战
+    - comment: "角色设定_龙战"
+      content: "作品/反派逆袭系统指南/角色设定_龙战.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 12
+      depth: 4
+      role: 0
+
+    # 角色设定_洛凝霜
+    - comment: "角色设定_洛凝霜"
+      content: "作品/反派逆袭系统指南/角色设定_洛凝霜.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 13
+      depth: 4
+      role: 0
+
+    # 角色设定_墨灵儿
+    - comment: "角色设定_墨灵儿"
+      content: "作品/反派逆袭系统指南/角色设定_墨灵儿.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 14
+      depth: 4
+      role: 0
+
+    # 角色设定_墨诗语
+    - comment: "角色设定_墨诗语"
+      content: "作品/反派逆袭系统指南/角色设定_墨诗语.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 15
+      depth: 4
+      role: 0
+
+    # 角色设定_墨云曦
+    - comment: "角色设定_墨云曦"
+      content: "作品/反派逆袭系统指南/角色设定_墨云曦.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 16
+      depth: 4
+      role: 0
+
+    # 角色设定_慕容冰岚
+    - comment: "角色设定_慕容冰岚"
+      content: "作品/反派逆袭系统指南/角色设定_慕容冰岚.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 17
+      depth: 4
+      role: 0
+
+    # 角色设定_秦岚
+    - comment: "角色设定_秦岚"
+      content: "作品/反派逆袭系统指南/角色设定_秦岚.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 18
+      depth: 4
+      role: 0
+
+    # 角色设定_秦逸
+    - comment: "角色设定_秦逸"
+      content: "作品/反派逆袭系统指南/角色设定_秦逸.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 19
+      depth: 4
+      role: 0
+
+    # 角色设定_上官千雪
+    - comment: "角色设定_上官千雪"
+      content: "作品/反派逆袭系统指南/角色设定_上官千雪.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 20
+      depth: 4
+      role: 0
+
+    # 角色设定_沈岸
+    - comment: "角色设定_沈岸"
+      content: "作品/反派逆袭系统指南/角色设定_沈岸.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 21
+      depth: 4
+      role: 0
+
+    # 角色设定_苏媚瑶
+    - comment: "角色设定_苏媚瑶"
+      content: "作品/反派逆袭系统指南/角色设定_苏媚瑶.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 22
+      depth: 4
+      role: 0
+
+    # 角色设定_苏清漪
+    - comment: "角色设定_苏清漪"
+      content: "作品/反派逆袭系统指南/角色设定_苏清漪.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 23
+      depth: 4
+      role: 0
+
+    # 角色设定_萧若烟
+    - comment: "角色设定_萧若烟"
+      content: "作品/反派逆袭系统指南/角色设定_萧若烟.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 24
+      depth: 4
+      role: 0
+
+    # 角色设定_叶瞳
+    - comment: "角色设定_叶瞳"
+      content: "作品/反派逆袭系统指南/角色设定_叶瞳.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 25
+      depth: 4
+      role: 0
+
+    # 角色设定_夜玄辰
+    - comment: "角色设定_夜玄辰"
+      content: "作品/反派逆袭系统指南/角色设定_夜玄辰.xyaml"
+      enabled: true
+      position: "after_char"
+      insertion_order: 26
+      depth: 4
+      role: 0
