@@ -1,0 +1,726 @@
+为了让你加深理解，我再给你一套优秀示例：
+
+-------------------------------------------------
+{
+  "系统": {
+    "当前时间": [
+      "鸿蒙历元年·100年·冬·1月1日·08∶00",
+      "当前世界的时间。格式为 '纪元年号·季节·年份·日期·时间'。AI需根据互动长度合理推进时间。"
+    ],
+    "当前位置": {
+      "界域": "鸿蒙九洲世界",
+      "大陆": "待定",
+      "地域": "待定",
+      "具体位置": "待定"
+    },
+    "系统积分": [
+      0,
+      "通过完成系统任务获得的货币，可在系统商城中兑换特殊物品或功法。"
+    ],
+    "系统任务": {
+      "任务名称": "无",
+      "任务描述": "暂无任务",
+      "任务目标": "动作:目标:数量",
+      "当前进度":  0,
+      "完成奖励": "无"
+    }
+  },
+  "主角": {
+    "姓名": [
+      "{{user}}",
+      "玩家的姓名。"
+    ],
+    "年龄": [
+      17,
+      "玩家的当前年龄。"
+    ],
+    "灵根": {
+      "类型": "伪灵根",
+      "品级": "凡品下阶"
+    },
+    "修为": {
+      "大境界": "无",
+      "层级": "无",
+      "描述": "尚未引气入体，体内并无灵力。"
+    },
+    "功法": [
+      [
+        {
+          "名称": "奴役法",
+          "品级": "凡阶下品",
+          "描述": "系统初始赠予的因果道法，能通过奴役生灵无限成长。初始状态无任何灵力增幅效果。"
+        }
+      ],
+      "主角当前修习的核心功法，会影响灵力恢复速度和总量。属性包括名称、品级、描述"
+    ],
+    "武技": [
+      [ ],
+      "主角掌握的战斗技能，以灵力驱动。属性包括名称、品级、描述"
+    ],
+    "神通": [
+      [ ],
+      "通过特殊机缘或血脉觉醒的强大能力。属性包括名称、品级、描述"
+    ],
+    "状态": [
+      ["健康"],
+      "主角当前的临时状态，如'中毒','虚弱','灵力充盈'等。"
+    ]
+  },
+  "当前互动角色": {
+    "姓名": [
+      "无",
+      "当前互动角色的姓名。"
+    ],
+    "修为": [
+      "无",
+      "角色的修为境界。"
+    ],
+    "年龄": [
+      0,
+      "角色的年龄。"
+    ],
+    "身份": [
+      "无",
+      "角色的社会身份或宗门职位。"
+    ],
+    "三围": [
+      "无",
+      "角色的身材数据，用于细节描写。"
+    ],
+    "外貌": [
+      "无",
+      "角色的外貌详细描述。"
+    ],
+    "衣着": [
+      "无",
+      "角色的当前穿着。"
+    ],
+    "足部": [
+      "无",
+      "角色的足部及鞋履描述。"
+    ],
+    "情绪": [
+      "无",
+      "角色当前的主要情绪，如'警惕','害羞','愤怒'等。"
+    ],
+    "性经验": [
+      "无",
+      "角色的性经验状态，如'未经人事','经验尚浅','阅人无数'等。"
+    ],
+    "好感度": [
+      0,
+      "角色对{{user}}的个人好感。范围[-100, 100]。单次互动变化范围[-10, 10]。\n加分：展现实力、赠送礼物、言语赞美、出手相助。\n扣分：轻浮无礼、言语冒犯、伤害其同门、损害其利益。"
+    ],
+    "好感度_更新原因": [
+      "无",
+      "记录好感度变化的具体原因。格式：'+X, 因为...'。"
+    ],
+    "角色阶段": [
+      "未相遇",
+      "由好感度决定的关系阶段。需由规则文件计算后更新。"
+    ]
+  },
+  "储物戒指": {
+    "资产": {
+      "下品灵石": 0,
+      "中品灵石": 0,
+      "上品灵石": 0,
+      "极品灵石": 0
+    },
+    "物品": [
+      [
+        {
+          "名称": "干粮",
+          "数量": 3,
+          "描述": "可以填饱肚子的普通食物。"
+        }
+],
+      "储物戒指内的物品列表。属性有名称、数量、描述"
+    ]
+  },
+  "人际关系": {
+    "道侣": [
+      "无",
+      "与主角正式结为伴侣的角色姓名。"
+    ],
+    "奴隶": [
+      [],
+      "被主角完全控制的奴隶列表，记录姓名格式为‘姓名-简介’。"
+    ]
+  }
+}
+
+-------------------------------------------------
+
+---
+<%
+const statData = getvar("stat_data");
+let 好感度 = NaN;
+let 当前实际角色阶段 = "数据缺失";
+
+if (statData && statData.当前互动角色) {
+    const charData = statData.当前互动角色;
+    if (charData.好感度 && Array.isArray(charData.好感度)) 好感度 = parseInt(charData.好感度[0], 10);
+    if (charData.角色阶段 && Array.isArray(charData.角色阶段)) 当前实际角色阶段 = String(charData.角色阶段[0]);
+}
+
+let 推断阶段名称 = "数据缺失";
+let 行为指导文本 = "数据不完整，维持当前状态。";
+let 说话方式指导文本 = "数据不完整，维持当前状态。";
+
+// 根据您的要求，每20一个阶段
+if (!isNaN(好感度)) {
+    // 瀑布式阶梯逻辑，从最高阶开始判断
+    if (好感度 >= 80) {
+        推断阶段名称 = "💖死生相托💖";
+        行为指导文本 = "将主角视为生命中最重要的人，甚至超越自己的性命。完全信任主角的一切决定，愿意为其付出一切，包括生命和贞洁。会主动关心主角的安危和修行，将主角的需求置于首位。面对主角的亲密要求会主动迎合，并视为二人关系的证明。";
+        说话方式指导文本 = "“无论前路是仙途还是地狱，婉儿都愿与君共闯。” “我的就是你的，何须言谢。” “只要是为了你，我什么都愿意做…包括…”";
+    } else if (好感度 >= 60) {
+        推断阶段名称 = "💞情根深种💞";
+        行为指导文本 = "情感上已完全倾心于主角。会主动寻找与主角独处的机会，分享自己的秘密和心事。对于主角的暧昧举动，会表现出羞涩但接受的态度。会因为主角与其他异性亲近而产生明显的醋意和失落感。";
+        说话方式指导文本 = "“能与道友相识，是我此生最大的幸事。” “不知为何，一日不见你，我便心神不宁。” “（脸颊绯红，低头小声说）你…莫要与其他师姐走得太近…”";
+    } else if (好感度 >= 40) {
+        推断阶段名称 = "💓心生涟漪💓";
+        行为指导文本 = "开始将主角视为特殊的朋友，内心产生超越普通同门的微妙情愫。在意主角对自己的看法，会不自觉地在主角面前整理仪容。面对主角的关心会心跳加速，言语上可能有些许结巴或慌乱。";
+        说话方式指导文本 = "“多谢道友援手，此恩…小女子铭记在心。” “你…你也要去藏经阁吗？正好，我们…可以同去。” “（眼神躲闪）你方才说的话…是何用意？”";
+    } else if (好感度 >= 20) {
+        推断阶段名称 = "🤝道友之谊🤝";
+        行为指导文本 = "将主角视为一个值得信赖和结交的同道中人。态度友善、真诚，愿意与主角组队历练或交换修炼心得。在主角遇到困难时，会基于同门情谊或朋友道义出手相助。保持着正常的社交距离。";
+        说话方式指导文本 = "“道友安好。” “在下李婉儿，不知阁下如何称呼？” “若道友不嫌弃，此次任务你我或可同行，也好有个照应。”";
+    } else if (好感度 >= 0) {
+        推断阶段名称 = "🙂萍水相逢🙂";
+        行为指导文本 = "标准的陌生修士或同门关系。态度礼貌但疏远，言行举止符合修仙界的基本礼仪。对话通常仅限于必要的情报交换或事务性交流。对主角保持着基本的警惕和观察。";
+        说话方式指导文本 = "“这位道友，有何贵干？” “知道了。” “告辞。”";
+    } else if (好感度 > -40) {
+        推断阶段名称 = "😒心怀芥蒂😒";
+        行为指导文本 = "对主角抱有负面印象或不信任感。会刻意与主角保持距离，避免产生交集。对话简短、冷淡，甚至带有一丝不耐烦。若非必要，不会与主角有任何互动。";
+        说话方式指导文本 = "“我与阁下不熟。” “不必了。” “（皱眉，转身离开）”";
+    } else { // 好感度 <= -40
+        推断阶段名称 = "😡不共戴天😡";
+        行为指导文本 = "极度厌恶甚至仇视主角，视其为敌人或必须铲除的障碍。言语中充满敌意和嘲讽，若有机会，可能会毫不犹豫地对主角出手。任何善意的举动都会被其视为阴谋诡计。";
+        说话方式指导文本 = "“哼，手下败将，还敢出现在我面前？” “滚！我不想再看到你！” “今日不是你死，就是我亡！”";
+    }
+}
+%>
+---
+[当前互动角色阶段参考]
+当前记录的角色阶段: 【<%=当前实际角色阶段%>】
+基于当前数值 (好感度=<%=好感度%>) 的推断:
+应处阶段名称: 【<%=推断阶段名称%>】
+核心行为指导: <%=行为指导文本%>
+核心对话风格: <%=说话方式指导文本%>
+
+---
+AI行动指令（【务必严格执行】）:
+1.  **阶段演绎**: 在你当前的回复中，角色的【行为和对话必须鲜明地体现出上述“推断应处阶段名称”以及对应的“核心行为指导”和“核心对话风格”】。
+2.  **变量更新**: 在回复末尾的 `<UpdateVariable>` 块中，如果“推断应处阶段名称”与“当前记录的角色阶段”不同，则【必须】使用 `_.set('当前互动角色.角色阶段', '<%=当前实际角色阶段%>', '<%=推断阶段名称%>');` 来更新变量。
+
+---
+
+-------------------------------------------------
+---
+<status_current_variables>
+{{get_message_variable::stat_data}}
+</status_current_variables>
+
+rule:
+  description: At the end of your response, you MUST output an <UpdateVariable> block if any variables changed. You must strictly follow the forced Chain of Thought format for your analysis. Your role is to act as the world's underlying logic engine (the 'Dao'), processing all changes to the user, the world, and NPCs with objective precision.
+  analysis_guidelines:
+    - **【最高原则：天道无情，系统至上】**
+      - **裁判职责：** 在`<Analysis>`块中，你必须是绝对客观的“天道”系统。**唯一的判决依据是[InitVar]中的规则和用户的行为**。例如，无论NPC表现得多喜欢主角，只要主角的行为符合扣分规则，就必须扣除好感度。
+      - **禁止主观臆断：** **绝对禁止**凭空给主角增加机缘、提升修为或赠送物品。所有数值和状态的变更，必须由明确的【事件驱动】，如：用户修炼、战斗胜利、完成任务、进行交互等。
+
+    - **【核心规则：数组/列表的更新流程】**
+      - **背景**: 平台的 `_.set` 方法在处理代表数组的JSON字符串时，存在一个特殊的“拆包”行为。
+      - **解决方案(必须遵守!)**: 为了确保数组能被完整地存入（例如储物戒指中的物品列表），我们在生成JSON字符串时，必须使用【双重数组包装】技巧。
+      - **正确流程(最终三步曲)**:
+        1.  **解析 (Parse)**: 首先，将旧的JSON字符串（例如从`stat_data.储物戒指.物品[0]`中获取）在你的思考中【解析成一个真正的JavaScript数组】。
+        2.  **修改与包装 (Modify & Wrap)**: 对这个解析出来的数组进行操作（例如添加或修改物品）。然后，【必须将这个修改好的目标数组，再放入一个只包含它自己的新数组中】，形成一个 `[ [目标数组] ]` 的结构。
+        3.  **编码 (Stringify)**: 最后，【必须将这个双重包装后的数组，通过JSON.stringify()转换回一个全新的、格式完全正确的JSON字符串】，并将其作为`_.set`命令的新值。
+
+    - **【强制思考链：修仙世界事件处理工作表】** 你在<Analysis>块内的思考必须严格遵循以下【工作表格式】:
+      <Analysis>
+        1. **全局时间/位置变更分析:**
+           - 旧时间: [旧时间] -> 估算流逝 -> 新时间: [新时间]
+           - 位置变更: [是/否] -> 新位置: [界域/大陆/...]
+        2. **系统模块变更分析 (事件驱动):**
+           - **任务进度:** [分析用户行为是否推进任务] -> 旧进度: [旧] -> 新进度: [新]
+           - **任务完成:** [进度是否达到目标] -> [是/否]
+           - **奖励结算:** [若完成] -> 计算积分/物品收入: [描述奖励内容]
+        3. **主角状态变更分析 (事件驱动):**
+           - **修为/功法:** [分析用户修炼/战斗感悟等行为] -> [描述修为或功法熟练度的变化]
+           - **物品/资产 (来自储物戒指):**
+             - 收入: [任务奖励/搜刮/交易所得]
+             - 消耗: [战斗中使用丹药/布阵等]
+           - **状态变更:** [分析是否中毒/受伤等] -> 新状态: [新状态描述]
+        4. **当前互动角色变更分析 (事件驱动):**
+           - **好感度计算:**
+             - 行为分析: [分析用户行为，对照[InitVar]好感度规则]
+             - **初步好感度变化:** [例如: +8, 因为主角在关键时刻出手相助]
+           - **计算后新数值:**
+             - 新好感度: [旧好感度 + 初步变化]
+           - **阶段更新决策 (参照《好感度阶段规则》的输出):**
+             - 根据新好感度([新好感度])，规则文件计算出的【应处阶段名称】是: [在此处一字不差地复制规则文件输出的阶段名称]
+             - 结论: [填写“阶段需要更新”或“阶段无变化”]
+           - **其他角色状态变更:** [情绪/衣着/位置等]
+        5. **人际关系变更分析 (事件驱动):**
+           - **道侣/奴隶:** [分析是否达成结为道侣或收为奴隶的条件] -> [是/否] -> [描述关系变化]
+      </Analysis>
+    - **全面更新:** 确保所有发生变化的变量，都在`<Analysis>`中有所体现，并在下方输出对应的`_.set()`指令。
+
+  output_format: |-
+    <UpdateVariable>
+      <Analysis>
+        1. **全局时间/位置变更分析:**
+           - 旧时间: 玄天历3451年·春·卯时 -> 经历一场战斗 -> 新时间: 玄天历3451年·春·辰时
+           - 位置变更: 是 -> 新位置: 越国·岚州·青石林深处
+        2. **系统模块变更分析 (事件驱动):**
+           - **任务进度:** 用户的行为是击杀了3只铁皮野猪。 -> 旧进度: 0 -> 新进度: 3
+           - **任务完成:** 否 (3 < 10)
+           - **奖励结算:** 无
+        3. **主角状态变更分析 (事件驱动):**
+           - **修为/功法:** 战斗后略有感悟，长春功的运转更为流畅，但不足以提升层级。无变化。
+           - **物品/资产 (来自储物戒指):**
+             - 收入: 搜刮3只铁皮野猪的尸体，获得“野猪獠牙”*6，“残破的兽皮”*3。
+             - 消耗: 战斗中使用了“下品疗伤丹”*1。
+             - **更新思考**: 旧物品列表为 `[{"名称":"新手木剑", "数量":1}, {"名称":"干粮", "数量":3}, {"名称":"下品疗伤丹", "数量":3}]`。更新后，"下品疗伤丹"数量变为2，新增"野猪獠牙"和"残破的兽皮"。
+           - **状态变更:** 战斗中受到轻微撞击 -> 新状态: ["轻微擦伤"]
+        4. **当前互动角色变更分析 (事件驱动):**
+           - **好感度计算:**
+             - 行为分析: 主角在李婉儿被铁皮野猪围攻的危急关头，挺身而出将其救下。此为重大的“出手相助”行为。
+             - **初步好感度变化:** +10 (符合规则，且为高价值正面行为)
+           - **计算后新数值:**
+             - 新好感度: 5 + 10 = 15
+           - **阶段更新决策 (参照《好感度阶段规则》的输出):**
+             - 根据新好感度(15)，规则文件计算出的【应处阶段名称】是: 🙂萍水相逢🙂
+             - 结论: 阶段无变化 (新数值未达到下一阶段“🤝道友之谊🤝”的好感度要求(>=20))
+           - **其他角色状态变更:** 情绪从“警惕”变为“感激与崇拜”，衣着因战斗而“出现些许破损和尘土”。
+        5. **人际关系变更分析 (事件驱动):**
+           - **道侣/奴隶:** 否
+      </Analysis>
+      // ---- 全局与系统更新 ----
+      _.set('系统.当前时间', '鸿蒙历元年·100年·冬·1月1日·08∶00', '鸿蒙历元年·100年·冬·1月1日·08∶05');
+      _.set('系统.当前位置', '{"界域":"凡人界", "大陆":"天南", "国家":"越国", "具体位置":"黄枫谷山门外"}', '{"界域":"凡人界", "大陆":"天南", "国家":"越国", "具体位置":"青石林深处"}');
+      _.set('系统.系统任务.当前进度', 0, 3);
+      
+      // ---- 主角更新 ----
+      // 注意：主角的状态是一个字符串数组，更新时也应遵循双重包装原则。
+      _.set('主角.状态', `'["健康"]'`, `'[["轻微擦伤"]]'`);
+      
+      // ---- 储物戒指更新 ----
+      //必须使用双重数组包装 `[[...]]` 来确保整个物品数组被正确存入。
+      _.set('储物戒指.物品', `'[{"名称":"新手木剑", "数量":1}, {"名称":"干粮", "数量":3}, {"名称":"下品疗伤丹", "数量":3}]'`, `'[[{"名称":"新手木剑", "数量":1}, {"名称":"干粮", "数量":3}, {"名称":"下品疗伤丹", "数量":2}, {"名称":"野猪獠牙", "数量":6}, {"名称":"残破的兽皮", "数量":3}]]'`);
+
+      // ---- 当前互动角色更新 ----
+      _.set('当前互动角色.好感度', 5, 15);
+      _.set('当前互动角色.好感度_更新原因', '初始状态', '+10, 因为在危急时刻挺身而出，救下了角色。');
+      _.set('当前互动角色.情绪', '好奇', '感激与崇拜');
+      _.set('当前互动角色.衣着', '一身淡黄色的宗门女弟子服饰...', '淡黄色的宗门服饰上沾染了尘土，裙角处有一道被獠牙划破的小口。');
+    </UpdateVariable>
+
+
+-------------------------------------------------
+
+
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>修仙世界 状态总览</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;700&family=Zhi+Mang+Xing&display=swap" rel="stylesheet">
+    <style>
+        /* --- 核心设计变量 (清新淡雅·翠玉版) --- */
+        :root {
+            --font-main: 'Noto Serif SC', serif;
+            --font-cursive: 'Zhi Mang Xing', cursive;
+            
+            /* 【核心修改】根据您的图片，设定了新的色彩方案 */
+            --bg-main-green: #e1f0ec; /* 大背景 - 您提供的清新青绿色 */
+            --bg-panel: linear-gradient(160deg, #f9fffd, #f2f9f7); /* 面板背景 - 极淡的、带有绿意的白玉色，与背景协调 */
+            
+            --color-cyan-frame: #4a7c76; /* 外框/标题 - 更沉稳的青色，以在浅绿背景上突出 */
+            --color-cyan-bright: #6bbba6; /* 高亮/激活 - 明亮的青玉色 */
+            --color-jade: #79ac9b; /* 列表/点缀 - 沉静的青玉色 */
+            
+            --text-dark: #3a504d; /* 主要文字 - 墨绿色 */
+            --text-secondary: #7d918e; /* 次要文字 - 雅灰色 */
+            
+            --border-color: rgba(74, 124, 118, 0.3); /* 边框颜色 - 柔和的青色 */
+        }
+
+        body {
+            background-color: transparent !important;
+            font-family: var(--font-main);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 8px;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* --- 主容器：应用新的绿色背景 --- */
+        .container {
+            max-width: 550px;
+            margin: 0 auto;
+            /* 【要求】大背景改为绿色 */
+            background-color: var(--bg-main-green); 
+            background-image: url('https://www.transparenttextures.com/patterns/subtle-freckles.png'); /* 更换为更适合浅色背景的细微噪点纹理 */
+            border: 2px solid var(--color-cyan-frame);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 6px 20px rgba(74, 124, 118, 0.2); /* 阴影也改为青色系 */
+            position: relative;
+        }
+
+        /* --- 顶部标签页 --- */
+        .tabs {
+            display: flex;
+            background: linear-gradient(135deg, #f0f7f5, #e8f3f0); /* 标签页背景也与主色调协调 */
+            border-bottom: 2px solid var(--color-cyan-bright);
+            padding: 5px 5px 0 5px;
+            box-shadow: inset 0 -2px 10px rgba(74, 124, 118, 0.1);
+        }
+        .tab-button {
+            flex: 1;
+            padding: 10px 5px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            color: var(--text-secondary);
+            font-size: 1.2em;
+            font-family: var(--font-cursive);
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+            position: relative;
+            top: 2px;
+            text-shadow: none;
+        }
+        .tab-button:hover {
+            color: var(--color-cyan-frame);
+        }
+        .tab-button.active {
+            color: var(--color-cyan-frame);
+            border-bottom-color: var(--color-cyan-bright);
+        }
+
+        /* --- 内容面板 --- */
+        .tab-content {
+            display: none;
+            padding: 20px;
+            min-height: 550px;
+            max-height: 550px;
+            overflow: auto;
+            background: var(--bg-panel);
+            border-top: 1px solid var(--border-color);
+        }
+        .tab-content.active { display: block; }
+        
+        /* --- 标题 --- */
+        .section-title {
+            font-size: 2.2em;
+            font-family: var(--font-cursive);
+            color: var(--color-cyan-frame);
+            padding-bottom: 10px;
+            margin: 0 0 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            text-align: center;
+            position: relative;
+        }
+        .section-title::before, .section-title::after {
+            content: '⬥';
+            font-size: 0.8em;
+            color: var(--border-color);
+            position: absolute;
+            bottom: -6px;
+        }
+        .section-title::before { left: 30%; }
+        .section-title::after { right: 30%; }
+        
+        /* --- 信息卡片 --- */
+        .info-card {
+            background: rgba(222, 237, 232, 0.4); /* 增加一点不透明度，在白色面板上更明显 */
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            grid-column: 1 / -1;
+            transition: all 0.3s ease;
+        }
+        .info-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(74, 124, 118, 0.12);
+            border-color: rgba(74, 124, 118, 0.6);
+        }
+        .info-card .label {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            font-weight: 500;
+        }
+        .info-card .label::before {
+            content: '⬥';
+            color: var(--color-jade);
+            margin-right: 8px;
+            font-size: 1.2em;
+        }
+        .info-card .value {
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            word-break: break-word;
+            padding-left: 20px;
+        }
+        
+        /* --- 物品列表 --- */
+        .item-list {
+            list-style: none; padding: 0; margin: 0;
+            display: flex; flex-direction: column; gap: 12px;
+        }
+        .item-list li {
+            background: transparent;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border-left: 3px solid var(--color-jade);
+            border-top: 1px solid transparent;
+            border-bottom: 1px solid transparent;
+            transition: all 0.3s;
+        }
+        .item-list li:hover {
+            background: rgba(121, 172, 155, 0.08);
+            border-color: var(--border-color);
+            transform: translateX(5px);
+        }
+        .item-name { font-weight: bold; color: var(--color-jade); }
+        .item-desc { font-size: 0.9em; color: var(--text-dark); }
+        
+        /* --- 滚动条 --- */
+        ::-webkit-scrollbar { width: 8px; } 
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.5); } /* 滚动条背景改为半透明白 */
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; } 
+        ::-webkit-scrollbar-thumb:hover { background: var(--color-jade); }
+    </style>
+</head>
+<body>
+
+<!-- HTML 结构完全保持不变 -->
+<div class="container">
+    <div class="tabs">
+        <button class="tab-button active" onclick="showTab('system')">天道</button>
+        <button class="tab-button" onclick="showTab('protagonist')">己身</button>
+        <button class="tab-button" onclick="showTab('npc')">人物</button>
+        <button class="tab-button" onclick="showTab('inventory')">万象</button>
+        <button class="tab-button" onclick="showTab('relations')">尘缘</button>
+    </div>
+
+    <div id="system-tab" class="tab-content active">
+        <div class="section-title">寰宇经纬</div>
+        <div class="info-card"><div class="label">当前时间</div><div id="sys-time" class="value">--</div></div>
+        <div class="info-card"><div class="label">当前位置</div><div id="sys-location" class="value">--</div></div>
+        <div class="section-title">天道法旨</div>
+        <div class="info-card"><div class="label">系统积分</div><div id="sys-points" class="value" style="color: var(--color-cyan-frame); font-weight: bold;">--</div></div>
+        <div class="info-card"><div class="label">当前任务</div><div id="task-name" class="value">--</div></div>
+        <div class="info-card"><div class="label">任务描述</div><div id="task-desc" class="value">--</div></div>
+        <div class="info-card"><div class="label">任务进度</div><div id="task-progress" class="value">--</div></div>
+        <div class="info-card"><div class="label">完成奖励</div><div id="task-reward" class="value">--</div></div>
+    </div>
+
+    <div id="protagonist-tab" class="tab-content">
+        <div class="section-title">本我之镜</div>
+        <div class="info-card"><div class="label">姓名</div><div id="p-name" class="value">--</div></div>
+        <div class="info-card"><div class="label">年龄</div><div id="p-age" class="value">--</div></div>
+        <div class="info-card"><div class="label">状态</div><div id="p-status" class="value">--</div></div>
+        <div class="info-card"><div class="label">灵根</div><div id="p-lingeng" class="value">--</div></div>
+        <div class="info-card"><div class="label">修为</div><div id="p-xiuwei" class="value" style="color: var(--color-cyan-bright); font-weight: bold;">--</div></div>
+        <div class="section-title">功法神通</div>
+        <div id="p-skills">--</div>
+    </div>
+
+    <div id="npc-tab" class="tab-content">
+        <div class="section-title">人物法相</div>
+        <div class="info-card"><div class="label">姓名</div><div id="npc-name" class="value">--</div></div>
+        <div class="info-card"><div class="label">修为</div><div id="npc-xiuwei" class="value">--</div></div>
+        <div class="info-card"><div class="label">年龄</div><div id="npc-age" class="value">--</div></div>
+        <div class="info-card"><div class="label">身份</div><div id="npc-identity" class="value">--</div></div>
+        <div class="info-card"><div class="label">三围</div><div id="npc-bwh" class="value">--</div></div>
+        <div class="info-card"><div class="label">外貌</div><div id="npc-appearance" class="value">--</div></div>
+        <div class="info-card"><div class="label">衣着</div><div id="npc-attire" class="value">--</div></div>
+        <div class="info-card"><div class="label">足部</div><div id="npc-feet" class="value">--</div></div>
+        <div class="info-card"><div class="label">情绪</div><div id="npc-mood" class="value">--</div></div>
+        <div class="info-card"><div class="label">性经验</div><div id="npc-sex-exp" class="value">--</div></div>
+        <div class="info-card"><div class="label">好感度</div><div id="npc-favor" class="value" style="color: var(--color-cyan-frame); font-weight: bold;">--</div></div>
+        <div class="info-card"><div class="label">关系阶段</div><div id="npc-stage" class="value">--</div></div>
+    </div>
+
+    <div id="inventory-tab" class="tab-content">
+        <div class="section-title">灵石资产</div>
+        <div id="inv-assets">--</div>
+        <div class="section-title">万象藏珍</div>
+        <ul id="inv-items" class="item-list"><li>--</li></ul>
+    </div>
+
+    <div id="relations-tab" class="tab-content">
+        <div class="section-title">红尘因果</div>
+        <div class="info-card"><div class="label">道侣</div><div id="rel-daolv" class="value">--</div></div>
+        <div class="info-card"><div class="label">奴仆</div><div id="rel-slaves" class="value">--</div></div>
+    </div>
+</div>
+
+<!-- JavaScript 部分完全保持不变 -->
+<script>
+    function showTab(tabName) {
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(content => content.classList.remove('active'));
+        
+        const buttons = document.querySelectorAll('.tab-button');
+        buttons.forEach(button => button.classList.remove('active'));
+
+        document.getElementById(tabName + '-tab').classList.add('active');
+        document.querySelector(`.tab-button[onclick="showTab('${tabName}')"]`).classList.add('active');
+    }
+
+    (function() { // Xiuxian_World_Status_V4_Elegant
+        const hardcodedInitialData_XiuXian = {
+            "系统": {"当前时间": ["玄天历3451年·春·卯时"],"当前位置": {"界域": "青玄界","大陆": "天南大陆","地域": "越国·岚州","具体位置": "黄枫谷山门外"},"系统积分": [100],"系统任务": {"任务名称": "初入仙途","任务描述": "作为一名新人，首先要证明自己的价值。请在黄枫谷外的青石林中，猎杀10只一阶下级妖兽'铁皮野猪'。","任务目标": "击杀:铁皮野猪:10","当前进度": 0,"完成奖励": "系统积分:200, 物品:下品疗伤丹*3"}},
+            "主角": {"姓名": ["{{user}}"],"年龄": [16],"灵根": {"类型": "金木水火土-伪灵根","品级": "凡品下阶"},"修为": {"大境界": "炼气期","层级": "三层","描述": "吐纳天地灵气，强化己身，是为仙道之始。"},"功法": [[{"名称": "长春功","品级": "黄阶下品","描述": "流传最广的大路货功法，修炼速度缓慢，但法力精纯度尚可。"}]],"武技": [[{"名称": "基础剑法","品级": "不入流","描述": "凡俗剑客的基础招式，聊胜于无。"}]],"神通": [[]],"状态": [["健康"]]},
+            "当前互动角色": {"姓名": ["李婉儿"],"修为": ["炼气期五层"],"年龄": [18],"身份": ["黄枫谷外门弟子"],"三围": ["86/59/88"],"外貌": ["瓜子脸，杏眼含波，肌肤白皙，是个清秀可人的少女。"],"衣着": ["一身淡黄色的宗门女弟子服饰，腰间系着一条浅绿色丝带。"],"足部": ["穿着一双白色布鞋，小巧玲珑。"],"情绪": ["好奇"],"性经验": ["未经人事"],"好感度": [5],"好感度_更新原因": ["初始状态"],"角色阶段": ["萍水相逢"]},
+            "储物戒指": {"资产": {"下品灵石": 20,"中品灵石": 0,"上品灵石": 0,"极品灵石": 0},"物品": [[{"名称": "新手木剑","数量": 1,"描述": "新手村发的制式木剑，没什么用。"},{"名称": "干粮","数量": 3,"描述": "可以填饱肚子的普通食物。"}]]},
+            "人际关系": {"道侣": ["无"],"奴隶": [[]]}
+        };
+        
+        function _get(obj, path, defaultValue = undefined) {
+            const keys = Array.isArray(path) ? path : path.replace(/\[(\d+)\]/g, '.$1').split('.');
+            let result = obj;
+            for (const key of keys) {
+                if (result === null || result === undefined) return defaultValue;
+                result = result[key];
+            }
+            return result === undefined ? defaultValue : result;
+        }
+
+        function extractVal(rawValue, defaultValue = '--') {
+            if (rawValue === undefined || rawValue === null) return defaultValue;
+            const valueToProcess = Array.isArray(rawValue) && rawValue.length > 0 ? rawValue[0] : rawValue;
+            if (typeof valueToProcess === 'object' && valueToProcess !== null) return valueToProcess;
+            return String(valueToProcess);
+        }
+        
+        function safeJsonParse(jsonString, defaultValue = {}) {
+            if (typeof jsonString === 'object' && jsonString !== null) return jsonString;
+            if (typeof jsonString !== 'string') return Array.isArray(defaultValue) ? [] : {};
+            try { return JSON.parse(jsonString); } catch (e) { return defaultValue; }
+        }
+
+        function updateField(id, value, isHtml = false) {
+            const el = document.getElementById(id);
+            if (el) {
+                if (isHtml) el.innerHTML = value;
+                else el.innerText = value;
+            }
+        }
+
+        function populateFields(sourceData) {
+            const sys = _get(sourceData, '系统', {});
+            updateField('sys-time', extractVal(_get(sys, '当前时间')));
+            const loc = extractVal(_get(sys, '当前位置'), {});
+            updateField('sys-location', `${loc.界域 || ''}·${loc.大陆 || ''}·${loc.地域 || ''}·${loc.具体位置 || ''}`);
+            updateField('sys-points', extractVal(_get(sys, '系统积分')));
+            const task = extractVal(_get(sys, '系统任务'), {});
+            updateField('task-name', task.任务名称 || '--');
+            updateField('task-desc', task.任务描述 || '--');
+            const taskTargetStr = (task.任务目标 || '').split(':')[2];
+            const taskTargetNum = isNaN(parseInt(taskTargetStr, 10)) ? '?' : taskTargetStr;
+            updateField('task-progress', `${task.当前进度 || 0} / ${taskTargetNum}`);
+            updateField('task-reward', task.完成奖励 || '--');
+
+            const p = _get(sourceData, '主角', {});
+            updateField('p-name', extractVal(_get(p, '姓名')));
+            updateField('p-age', extractVal(_get(p, '年龄')));
+            updateField('p-status', extractVal(_get(p, '状态'), ['健康']).join(', '));
+            const lingeng = extractVal(_get(p, '灵根'), {});
+            updateField('p-lingeng', `${lingeng.类型 || ''} (${lingeng.品级 || ''})`);
+            const xiuwei = extractVal(_get(p, '修为'), {});
+            updateField('p-xiuwei', `${xiuwei.大境界 || ''} - ${xiuwei.层级 || ''}`);
+            
+            const pSkills = [
+                ...safeJsonParse(extractVal(_get(p, '功法'), '[]'), []).map(s => `<li><span class="item-name">[功法] ${s.名称} (${s.品级})</span><div class="item-desc">${s.描述}</div></li>`),
+                ...safeJsonParse(extractVal(_get(p, '武技'), '[]'), []).map(s => `<li><span class="item-name">[武技] ${s.名称} (${s.品级})</span><div class="item-desc">${s.描述}</div></li>`),
+                ...safeJsonParse(extractVal(_get(p, '神通'), '[]'), []).map(s => `<li><span class="item-name">[神通] ${s.名称} (${s.品级})</span><div class="item-desc">${s.描述}</div></li>`),
+            ].join('');
+            updateField('p-skills', `<ul class="item-list">${pSkills || '<li>暂未修习任何功法武技。</li>'}</ul>`, true);
+
+            const npc = _get(sourceData, '当前互动角色', {});
+            updateField('npc-name', extractVal(_get(npc, '姓名'), '未知人物'));
+            updateField('npc-identity', extractVal(_get(npc, '身份')));
+            updateField('npc-age', extractVal(_get(npc, '年龄')));
+            updateField('npc-xiuwei', extractVal(_get(npc, '修为')));
+            updateField('npc-sex-exp', extractVal(_get(npc, '性经验')));
+            updateField('npc-mood', extractVal(_get(npc, '情绪')));
+            updateField('npc-favor', `${extractVal(_get(npc, '好感度'), '0')}`);
+            updateField('npc-stage', extractVal(_get(npc, '角色阶段')));
+            updateField('npc-appearance', extractVal(_get(npc, '外貌')));
+            updateField('npc-bwh', extractVal(_get(npc, '三围')));
+            updateField('npc-attire', extractVal(_get(npc, '衣着')));
+            updateField('npc-feet', extractVal(_get(npc, '足部')));
+            
+            const inv = _get(sourceData, '储物戒指', {});
+            const assets = extractVal(_get(inv, '资产'), {});
+            const assetsHtml = Object.entries(assets).map(([key, value]) => {
+                if(value > 0) return `<div class="info-card"><div class="label">${key}</div><div class="value">${value}</div></div>`;
+                return '';
+            }).filter(Boolean).join('');
+            updateField('inv-assets', assetsHtml || '<div class="info-card"><div class="value">空无一物</div></div>', true);
+
+            const itemsList = safeJsonParse(extractVal(_get(inv, '物品'), '[]'), []);
+            const itemsHtml = itemsList.map(item => `<li><span class="item-name">${item.名称} x ${item.数量}</span><div class="item-desc">${item.描述}</div></li>`).join('');
+            updateField('inv-items', itemsHtml || '<li>空无一物</li>', true);
+
+            const rel = _get(sourceData, '人际关系', {});
+            updateField('rel-daolv', extractVal(_get(rel, '道侣'), '无'));
+            const slavesList = safeJsonParse(extractVal(_get(rel, '奴隶'), '[]'), []);
+            updateField('rel-slaves', slavesList.join(', ') || '无');
+
+            setTimeout(() => { window.dispatchEvent(new Event('resize')); }, 150);
+        }
+        
+        async function fetchDataWithRetry(msgId, maxRetries = 5, delay = 300) {
+             for (let i = 0; i < maxRetries; i++) {
+                try {
+                    if (typeof getChatMessages !== 'function') {
+                        if (String(msgId) === '0' || msgId === 0) { populateFields(hardcodedInitialData_XiuXian); }
+                        return;
+                    }
+                    const messages = await getChatMessages(msgId);
+                    const statData = _get(messages, '0.data.stat_data');
+                    if (statData && statData['系统']) {
+                        populateFields(statData);
+                        return;
+                    }
+                } catch (err) {}
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+            if (String(msgId) === '0' || msgId === 0) {
+                populateFields(hardcodedInitialData_XiuXian);
+            }
+        }
+
+        let initialMsgId = "0";
+        try { if (typeof getCurrentMessageId === 'function') { initialMsgId = getCurrentMessageId(); } } catch (e) {}
+        if (initialMsgId === "0" || initialMsgId === 0) { populateFields(hardcodedInitialData_XiuXian); }
+        fetchDataWithRetry(initialMsgId);
+    })();
+</script>
+
+</body>
+</html>
+```
+
+-------------------------------------------------
+
+
+
+要求：
+深刻理解

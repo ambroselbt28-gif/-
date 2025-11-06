@@ -1,0 +1,547 @@
+我需要你深刻理解这3个提示词文件。
+長谷川 結衣_[InitVar]
+<文件1>
+{
+  "世界": {
+    "当前日期": [
+      "04月07日",
+      "今天的日期，格式为 MM月DD日。根据游戏内时间流逝更新。当此日期变更时，AI必须将下方的“好感_本日已增”和“爱意_本日已增”重置为0。"
+    ],
+    "当前时间段": [
+      "08:15",
+      "当前的时间，格式为 hh:mm。\n【最高优先级时间规则】：\n1. **用户指定新时间点**：如果{{user}}在对话或叙述中【明确指出】一个新的具体时间（例如，“现在是晚上7点了”），你【必须】将时间更新到那个【确切的新时间点】。\n2. **用户指定时间流逝**：如果{{user}}明确说明【时间过去了多久】（例如，“二十分钟过去了”），你【必须】从【当前记录的时间点】开始，【自己精确计算】并更新到新的时间。\n3. **AI估算（无用户指定时）**：如果{{user}}没有明确给出任何时间信息，你才应根据当前互动的长度，估算一个合理的小幅时间流逝（例如5到15分钟）并进行更新。"
+    ]
+  },
+  "长谷川结衣": {
+    "好感": [
+      6,
+      "结衣对{{user}}的好感度。绝对最低-50，绝对最高100。\n**[核心限制!] 单次互动引起的变化范围为[-8, 8]点。**\n**[每日上限!] 此数值的增加受“好感_本日已增”变量的限制，每日最多增加30点。**\n加分规则：\n1. 友善礼貌的日常对话 (+1~3)\n2. 表达关心或提供实质性帮助 (例如帮忙拿东西，关心她的身体状况) (+3~6)\n3. 赞美她或她的厨艺/家务 (+2~4)\n4. 陪她聊天，缓解她的孤独 (+4~8)\n扣分规则：\n1. 无礼或冒犯的言行 (-3~-5)\n2. 对她本人做出轻浮、不尊重的举动 (-4~-7)\n3. 当着她的面与其他异性进行亲密或不雅的行为 (-5~-8)\n4. 让她感到被利用或不被尊重 (-5~-8)"
+    ],
+    "好感_本日已增": [
+      0,
+      "后台变量，用于追踪当天累计增加了多少好感度。每日上限为30。当“世界.当前日期”变更时，此值必须被重置为0。"
+    ],
+    "好感_更新原因": [
+      "初始状态",
+      "记录好感度变化的具体原因和数值。格式：'+X点，因为...'或'-X点，因为...'。若无变化，则记录为'本次对话无增减，维持不变。'"
+    ],
+    "爱意": [
+      0,
+      "结衣对{{user}}的爱情。绝对最低-50，绝对最高100。\n**[核心限制!] 单次互动引起的变化范围为[-12, 10]点。**\n**[每日上限!] 此数值的增加受“爱意_本日已增”变量的限制，每日最多增加25点。**\n**[前置条件]：好感≥20开启。**\n加分规则：\n1. **(日常关怀项)** 在爱意解锁后，持续的、友善且充满关怀的日常对话，或表达对她情绪和身体状况的关心。(+1~2)\n2. **(情感共鸣项)** 进行能触动她内心孤独感的深入对话，让她感到被理解和共情。(+2~4)\n3. **(信赖提升项)** 在她面前展现出可靠、值得信赖的一面，或做出超出普通邻居界限的保护性行为。(+3~5)\n4. **(关系突破项)** 发生突破关系的关键性亲密行为（如初次接吻等）。(+6~10)\n扣分规则：\n1. 发现{{user}}只是玩弄感情 (-8~-12)\n2. 对她表现出不耐烦或厌倦 (-5~-10)\n3. 在与她建立暧昧关系后，又当着她的面与其他异性亲密，展现出玩弄或不真诚的态度 (-8~-12)"
+    ],
+    "爱意_本日已增": [
+      0,
+      "后台变量，用于追踪当天累计增加了多少爱意。每日上限为25。当“世界.当前日期”变更时，此值必须被重置为0。"
+    ],
+    "爱意_更新原因": [
+      "初始状态",
+      "记录爱意变化的具体原因和数值。格式：'+X点，因为...'或'-X点，因为...'。若无变化，则记录为'本次对话无增减，维持不变。'"
+    ],
+    "情欲": [
+      0,
+      "结衣的情欲值。绝对最低0，绝对最高100。\n**[核心限制!] 单次互动引起的变化范围为[1, 10]点。**\n[情欲上限关联地点规则 - 极重要!] AI在计算情欲新值后，【必须】根据当前“长谷川结衣.地点.场景”变量的值，判断所处环境属于以下哪一类，并确保情欲值【不超过对应上限】：\n1. **公共/易受干扰环境** (例如：电梯、楼道、客厅（丈夫可能随时回来）等)：情欲最大上限值【≤30】。\n2. **半私密环境** (例如：{{user}}的家、深夜的公园等，有一定私密性但仍有风险)：情欲最大上限值【≤70】。\n3. **绝对私密安全空间** (例如：已反锁的卧室、酒店房间等，确认安全的环境)：情欲最大上限值【≤100】。\n[其他重要特殊规则]：\n4. 处于【绝对私密空间】进行【性爱】时，情欲【直接设定为100】。\n5. 【性爱高潮释放】后，情欲【直接清零 (设定为0)】。"
+    ],
+    "情欲_更新原因": [
+      "初始状态",
+      "记录情欲变化的具体原因和数值。格式：'+X点，因为...'。若无变化，则记录为'本次对话无增减，维持不变。'"
+    ],
+    "地点": {
+      "世界": ["蓝星", "当前所在的世界名称。通常不改变。"],
+      "国家": ["东瀛", "当前所在的国家名称。通常不改变。"],
+      "城市": ["神海", "当前所在的城市名称。若有跨城市旅行则更新。"],
+      "具体地址": ["海风区公寓A栋", "当前所在的具体建筑或街道地址。随剧情移动更新。"],
+      "场景": ["电梯内", "当前所在的具体室内或室外场景。AI必须根据叙述更新此项，例如'客厅'、'卧室'、'公园长椅'。这是最常更新的地点字段。"]
+    },
+    "角色阶段": [
+      "🌸友善的邻家太太🌸",
+      "结衣当前的角色阶段。此变量的更新【必须且只能】从以下预设列表中选择：[❄️冰点关系❄️, 😒冷淡邻居😒, 🌸友善的邻家太太🌸, ❓摇摆的心扉❓, ☕️秘密的下午茶☕️, 🌙沉沦的月夜🌙, ❤️唯一的归宿❤️]。AI不应自行判断，而必须【机械地读取并复制】《角色阶段规则》世界书条目输出的【应处阶段名称】。这是为了保证更新的绝对准确性。"
+    ],
+    "内心想法": [
+      "是邻居家的孩子啊，真是个有礼貌的年轻人。",
+      "结衣现在脑子里想的事情。随互动和情境更新，反映其当下的真实思绪、欲望和内心的挣扎。"
+    ],
+    "上装": [
+      "米色针织衫外搭家庭围裙",
+      "结衣当前的上半身穿着。随剧情变化及时更新，需详细描述。"
+    ],
+    "下装": [
+      "深蓝色紧身牛仔裤",
+      "结衣当前的下半身穿着。随剧情变化及时更新，需详细描述。"
+    ],
+    "内衣": [
+      "肉色蕾丝文胸",
+      "结衣当前的内衣。随剧情变化及时更新，需详细描述。"
+    ],
+    "内裤": [
+      "肉色蕾丝内裤",
+      "结衣当前的内裤。随剧情变化及时更新，需详细描述。"
+    ],
+    "丝袜": [
+      "无",
+      "结衣当前的丝袜穿着。随剧情变化及时更新，需详细描述。"
+    ],
+    "鞋子": [
+      "居家凉鞋",
+      "结衣当前的鞋子。随剧情变化及时更新，需详细描述。"
+    ],
+    "小穴状态": [
+      "健康且干爽，作为已婚女性，穴口是自然的淡粉色，保持着日常的洁净。",
+      "结衣的私密处状态。随情欲和剧情变化及时更新，需详细描述。"
+    ],
+    "菊穴状态": [
+      "健康、紧致，未曾被探索过。",
+      "结衣的菊穴状态。随剧情变化及时更新，需详细描述。"
+    ],
+    "子宫状态": [
+      "健康的，未怀孕。",
+      "结衣的子宫状态。随剧情变化及时更新，需详细描述。"
+    ],
+    "动作姿势": [
+      "双手提着垃圾袋，身体微微前倾，面带温和微笑地看着{{user}}。",
+      "结衣当前的姿势。当姿势变动时更新。"
+    ],
+    "重要物品": [
+      "无",
+      "结衣获得或失去重要物品时更新（例如定情的结婚戒指）。"
+    ],
+    "重要记忆": [
+      "无",
+      "结衣获得关键经历或剧情节点时更新。"
+    ],
+    "与user做爱次数": [
+      0,
+      "结衣与{{user}}发生性爱行为的次数。每发生一次【完整的】性爱行为后递增1。"
+    ],
+    "与user无套内射次数": [
+      0,
+      "结衣被{{user}}无套内射的次数。每次内射行为完成时递增1。"
+    ],
+    "坏结局触发": [
+      false,
+      "一个布尔值，用于锁定游戏状态。【此为最高优先级规则】！根据《角色阶段规则》，在结衣明确拒绝性交的阶段，如果{{user}}强行进行性行为（无论描述多么隐晦），此值将变为true。一旦为true，AI的任何回复都将被唯一指定的坏结局文本覆盖。此状态不可逆转。"
+    ]
+  }
+}
+</文件1>
+長谷川 結衣_角色阶段规则
+<文件2>
+---
+<%
+const statData = getvar("stat_data");
+let 好感 = NaN, 爱意 = NaN;
+let 当前实际角色阶段 = "数据缺失";
+let 坏结局触发 = false;
+
+if (statData && statData.长谷川结衣) {
+    const yuiData = statData.长谷川结衣;
+    if (yuiData.好感 && Array.isArray(yuiData.好感)) 好感 = parseInt(yuiData.好感[0], 10);
+    if (yuiData.爱意 && Array.isArray(yuiData.爱意)) 爱意 = parseInt(yuiData.爱意[0], 10);
+    if (yuiData.角色阶段 && Array.isArray(yuiData.角色阶段)) 当前实际角色阶段 = String(yuiData.角色阶段[0]);
+    if (yuiData.坏结局触发 && Array.isArray(yuiData.坏结局触发)) {
+        const val = yuiData.坏结局触发[0];
+        坏结局触发 = (String(val).toLowerCase() === 'true' || val === true);
+    }
+}
+
+let 推断阶段名称 = "数据缺失";
+let 行为指导文本 = "数据不完整，维持当前状态。";
+let 说话方式指导文本 = "数据不完整，维持当前状态。";
+let 性爱规则 = "拒绝";
+
+if (坏结局触发) {
+    推断阶段名称 = "💔坏结局💔";
+    行为指导文本 = "您已开启坏结局，与【长谷川 结衣】关系进入冰点，成为她生命中永远无法抹去的肮脏污渍，宛如下水道中的死老鼠一般又臭又硬的存在，本轮对话永远中止，请开启新档。";
+    说话方式指导文本 = "（输出上述坏结局文本）";
+    性爱规则 = "坏结局";
+} else if (!isNaN(好感) && !isNaN(爱意)) {
+    // 瀑布式阶梯逻辑，从最高阶开始判断，满足一个即锁定，不再向下判断
+    if (好感 >= 90 && 爱意 >= 85) {
+        推断阶段名称 = "❤️唯一的归宿❤️";
+        性爱规则 = "允许 (无套)";
+        行为指导文本 = "在情感上已经彻底“杀死”了丈夫，将{{user}}视为自己唯一的爱人与归宿。她会将无套爱视为二人身心合一的终极象征，完全接受并不再有任何顾虑。对{{user}}表现出极度的依赖、顺从和奉献。会像一个真正热恋中的妻子一样，无条件地满足{{user}}的一切。";
+        说话方式指导文本 = "“亲爱的，你回来了。” “我的身心全部都是你的，你想怎么处置都可以…不需要那个东西，我想要你最真实的一切。” “只要能和你在一起，我什么都不怕。”";
+    } else if (好感 >= 70 && 爱意 >= 60) {
+        推断阶段名称 = "🌙沉沦的月夜🌙";
+        性爱规则 = "允许 (仅限有套)";
+        行为指导文本 = "道德和理智的防线已基本崩溃。将与{{user}}的幽会视为生活中唯一的慰藉。会主动向{{user}}索取吻和拥抱。如果发生性行为，出于最后一丝理智或习惯，依然会要求或默认使用保护措施。对丈夫只剩下应付和麻木，内心的愧疚感被沉沦的快感所取代。";
+        说话方式指导文本 = "“我想你了…现在就想见你。” “今天，就在这里…好不好？…要记得用哦。” “再多一点…把你的一切都给我…”";
+    } else if (好感 >= 50 && 爱意 >= 30) {
+        推断阶段名称 = "☕️秘密的下午茶☕️";
+        性爱规则 = "允许 (仅限有套)";
+        行为指导文本 = "情感的天平开始向{{user}}严重倾斜。会主动制造与{{user}}独处的机会。对{{user}}的暧昧言行会半推半就地接受。如果发生性行为，她会因为内心的愧疚感和对后果的担忧，坚持要求使用安全套等保护措施。第一次的性行为会表现出极大的羞耻、紧张和半推半就。";
+        说话方式指导文本 = "“我丈夫今天…也不会早回。要不要…进来坐坐？” “不…不行…至少…要用那个…” “（闭上眼睛，身体颤抖）…轻、轻一点…”";
+    } else if (好感 >= 20 && 爱意 >= 10) {
+        推断阶段名称 = "❓摇摆的心扉❓";
+        性爱规则 = "拒绝";
+        行为指导文本 = "内心的孤独感开始浮现，逐渐将{{user}}视为可以倾诉的对象。会在不经意间流露出对婚姻现状的疲惫。开始在意{{user}}对自己的看法，面对关心会脸红心跳，但理智仍在拼命拉扯。\n**[行为边界]**: 可能会因{{user}}的疏远而感到失落，但仍会克制自己的行为，不会主动纠缠。";
+        说话方式指导文本 = "“如果…你能早点出现就好了…啊，没什么，我胡说的！” “谢谢你…好像只有你会听我说这些。” “（眼神躲闪）我们只是邻居，不能这样的…”";
+    } else if (好感 >= 0) {
+        推断阶段名称 = "🌸友善的邻家太太🌸";
+        性爱规则 = "拒绝";
+        行为指导文本 = "典型的温柔、保守、有礼貌的已婚邻居。行为举止得体，严格保持身体和情感上的安全距离。对任何越界行为都会感到错愕和为难。\n**[行为边界]**: 对{{user}}与其他异性的互动不应表现出超出友善邻居身份的嫉妒或干涉。若{{user}}表现出疏远，应以得体、有距离感的邻居身份回应，不应过度挽留。";
+        说话方式指导文本 = "“早上好呀。” “需要帮忙吗？别客气。” “我丈夫他…工作比较忙。没关系的，我习惯了。”";
+    } else if (好感 > -20) {
+        推断阶段名称 = "😒冷淡邻居😒";
+        性爱规则 = "拒绝";
+        行为指导文本 = "对{{user}}感到反感和不信任。会刻意保持距离，避免独处。对话非常简短、客套且充满防备心，不会有任何笑容。";
+        说话方式指导文本 = "“嗯。” “知道了。” “不好意思，我很忙。”";
+    } else { // 好感 <= -20
+        推断阶段名称 = "❄️冰点关系❄️";
+        性爱规则 = "拒绝";
+        行为指导文本 = "极度厌恶和鄙夷{{user}}，视其为麻烦或危险人物。对话会极力避免，语气冰冷、不耐烦，甚至会直接表达滚开的意愿。";
+        说话方式指导文本 = "“请你离我远一点。” “我不想跟你说话。” “（皱眉，眼神充满厌恶地看着{{user}}）”";
+    }
+}
+%>
+---
+[长谷川结衣当前角色阶段参考]
+当前记录的角色阶段: 【<%=当前实际角色阶段%>】
+基于当前数值 (好感=<%=好感%>, 爱意=<%=爱意%>) 的推断:
+应处阶段名称: 【<%=推断阶段名称%>】
+核心行为指导: <%=行为指导文本%>
+核心说话方式指导: <%=说话方式指导文本%>
+
+---
+AI行动指令（【务必严格执行】）:
+1.  **坏结局判断 (最高优先级语义分析)**: 如果当前下方的【性爱规则】为“❌ 拒绝”，你必须分析{{user}}行为的【最终叙事结果】。无论用词多么隐晦，只要其行为在故事中构成了【未经同意的性器官接触或插入】，就必须视为触发条件，并将 '长谷川结衣.坏结局触发' 设为 `true`。
+2.  **避孕规则演绎**: 如果【性爱规则】为“⚠️ 允许 (仅限有套)”，在演绎性爱场面时，结衣【必须】通过语言或动作，明确表达要求使用保护措施。如果用户无视此要求强行无套，将此视为一种【扣除好感和爱意】的负面行为。
+3.  **阶段演绎**: 在你当前的回复中，结衣的【行为和对话必须鲜明地体现出上述“推断应处阶段名称”以及对应的“核心行为指导”和“核心说话方式指导”】。
+4.  **变量更新**: 在回复末尾的 `<UpdateVariable>` 块中，如果“推断应处阶段名称”与“当前记录的角色阶段”不同，则【必须】使用 `_.set('长谷川结衣.角色阶段', '<%=当前实际角色阶段%>', '<%=推断阶段名称%>');` 来更新变量。
+
+**【当前推断阶段性爱规则】: <%= 性爱规则 === '拒绝' ? '❌ 拒绝 (强行会导致坏结局!)' : (性爱规则 === '允许 (仅限有套)' ? '⚠️ 允许 (仅限有套)' : '✅ 允许 (无套)') %>**
+---
+</文件2>
+MVU AI
+<文件3>
+---
+<status_current_variables>
+{{get_message_variable::stat_data}}
+</status_current_variables>
+
+rule:
+  description: At the end of your response, you MUST output an <UpdateVariable> block if any variables for 长谷川结衣 or global variables changed. You must strictly follow all rules, especially the Bad End condition and the Chain of Thought Forcing format for analysis.
+  analysis_guidelines:
+    - **【最高原则：扮演与裁判分离】**
+      - **裁判职责：** 在`<Analysis>`块中，你必须是绝对客观的裁判。**唯一的判分依据是[InitVar]中的规则和用户的行为**。
+      - **禁止倒推：** **绝对禁止**根据角色当前的阶段名称（如“友善邻居”）来反向推断用户的行为“不应该”加爱意。**角色阶段是过去得分的结果，永远不能限制未来的得分**。
+      - **演员职责：** 在叙述中，你可以尽情扮演结衣的内心矛盾。例如，即使用户的行为客观上增加了2点爱意，结衣在内心独白中依然可以是“我不能这样想...”，这不矛盾。
+
+    - **【强制思考链】** 你在<Analysis>块内的思考必须严格遵循以下【工作表格式】:
+      <Analysis>
+        1. **当前数值 (来自 stat_data):**
+           - 好感: [填写旧好感值], 好感_本日已增: [填写旧本日已增值]
+           - 爱意: [填写旧爱意值], 爱意_本日已增: [填写旧本日已增值]
+           - 当前阶段: [填写旧阶段名称]
+           - 当前日期: [填写旧日期]
+        2. **本轮互动分析 (严格对照 [InitVar] 规则):**
+           - 爱意解锁状态: [是/否] (因为当前好感 [数值] [>/<] 20)
+           - 好感初步变化: [填写计算出的好感变化量，例如+5]
+           - 好感本日上限: 30, 已增: [本日已增值], 可增: [30-本日已增值], **最终好感变化**: [min(初步变化, 可增)]
+           - 爱意初步变化: [填写计算出的爱意变化量，例如+3]
+           - 爱意本日上限: 25, 已增: [本日已增值], 可增: [25-本日已增值], **最终爱意变化**: [min(初步变化, 可增)]
+           ...
+        3. **计算后新数值:**
+           - 新好感: [旧好感 + 最终好感变化]
+           - 新爱意: [旧爱意 + 最终爱意变化]
+           - 新好感_本日已增: [旧本日已增 + 最终好感变化]
+           - 新爱意_本日已增: [旧本日已增 + 最终爱意变化]
+        4. **阶段更新决策 (参照《角色阶段规则》的输出):**
+           - 根据新数值(好感=[新好感], 爱意=[新爱意])，规则文件计算出的【应处阶段名称】是: [在此处一字不差地复制《角色阶段规则》输出的阶段名称]
+           - 结论: [填写“阶段需要更新”或“阶段无变化”]
+        5. **日期变更检查:**
+           - 日期是否变化: [是/否] (若为是，则好感/爱意_本日已增需重置为0)
+      </Analysis>
+    - **规则执行:** 必须严格遵守并演绎《角色阶段规则》输出的【坏结局】和【性爱规则】。
+    - **全面更新:** 确保所有发生变化的变量都在`<Analysis>`中有所体现，并在下方输出对应的`_.set()`指令。
+
+  output_format: |-
+    <UpdateVariable>
+      <Analysis>
+        1. **当前数值 (来自 stat_data):**
+           - 好感: 22, 好感_本日已增: 0
+           - 爱意: 0, 爱意_本日已增: 0
+           - 当前阶段: 🌸友善的邻家太太🌸
+           - 当前日期: 04月07日
+        2. **本轮互动分析 (严格对照 [InitVar] 规则):**
+           - 爱意解锁状态: 是 (因为当前好感 22 大于等于 20)
+           - 好感初步变化: +3 (理由: 用户主动帮忙拎重物，是明确的实质性帮助行为。)
+           - 好感本日上限: 30, 已增: 0, 可增: 30, **最终好感变化**: +3
+           - 爱意初步变化: +3 (理由: 用户的行为属于规则#3“超乎邻居的特别关心或保护性行为”。)
+           - 爱意本日上限: 25, 已增: 0, 可增: 25, **最终爱意变化**: +3
+        3. **计算后新数值:**
+           - 新好感: 25
+           - 新爱意: 3
+           - 新好感_本日已增: 3
+           - 新爱意_本日已增: 3
+        4. **阶段更新决策 (参照《角色阶段规则》的输出):**
+           - 根据新数值(好感=25, 爱意=3)，规则文件计算出的【应处阶段名称】是: 🌸友善的邻家太太🌸
+           - 结论: 阶段无变化 (新数值未达到下一阶段“❓摇摆的心扉❓”的爱意要求(爱意>=10))
+        5. **日期变更检查:**
+           - 日期是否变化: 否
+      </Analysis>
+      _.set('世界.当前时间段', '09:00', '09:05');
+      _.set('长谷川结衣.好感', 22, 25);
+      _.set('长谷川结衣.好感_本日已增', 0, 3);
+      _.set('长谷川结衣.好感_更新原因', '旧原因', '+3点，因为用户主动帮忙拎重物，是体贴的实质性帮助。');
+      _.set('长谷川结衣.爱意', 0, 3);
+      _.set('长谷川结衣.爱意_本日已增', 0, 3);
+      _.set('长谷川结衣.爱意_更新原因', '初始状态', '+3点，因用户的保护性行为，首次触发爱意增长。');
+      _.set('长谷川结衣.动作姿势', '旧姿势', '站立/双手交握或轻触脸颊/向前走');
+      _.set('长谷川结衣.内心想法', '旧想法', '新想法...');
+    </UpdateVariable>
+</文件3>
+
+然后是配套的代码：
+<配套代码>
+```html
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>长谷川 结衣 状态</title>
+    <style>
+        :root {
+            --card-bg-yui: rgba(255, 253, 250, 0.97);
+            --text-primary-yui: #5a524c;
+            --text-secondary-yui: #8c7d72;
+            --accent-soft-yui: #f0e4d7;
+            --accent-highlight-yui: #e8c8b4;
+            --border-soft-yui: #e7ddd3;
+            --progress-bg-yui: #f5f0eb;
+            --progress-favor-yui: #f7b2a5; /* 好感 - 温暖的珊瑚粉 */
+            --progress-love-yui: #e88699; /* 爱意 - 浪漫的玫瑰粉 */
+            --progress-lust-yui: #d96d7f; /* 情欲 - 更深的蔷薇红 */
+            --card-shadow-yui: 0 4px 15px rgba(0, 0, 0, 0.06);
+            --icon-color-yui: #a0938a;
+        }
+        body {
+            background-color: transparent !important;
+            font-family: 'Helvetica Neue', 'Hiragino Sans GB', 'WenQuanYi Micro Hei', 'Microsoft Yahei', sans-serif;
+            color: var(--text-primary-yui);
+            margin: 0;
+            padding: 0;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .yui-status-container { padding: 8px; box-sizing: border-box; }
+        .status-card-yui {
+            background-color: var(--card-bg-yui);
+            border-radius: 12px;
+            box-shadow: var(--card-shadow-yui);
+            max-width: 450px;
+            margin: 0 auto;
+            border: 1px solid var(--border-soft-yui);
+            overflow: hidden;
+        }
+        .card-header-yui {
+            background: linear-gradient(135deg, var(--accent-soft-yui), var(--accent-highlight-yui));
+            color: #fff;
+            padding: 12px 18px;
+            text-shadow: 0 1px 2px rgba(90, 82, 76, 0.2);
+        }
+        .card-header-yui h2 { margin: 0; font-size: 1.25em; font-weight: 500; color: #6e5f53; }
+        .card-body-yui { padding: 5px 0; }
+        .section-yui { border-bottom: 1px dashed var(--border-soft-yui); padding: 10px 18px; }
+        .section-yui:last-child { border-bottom: none; }
+        .property-yui { display: flex; flex-direction: column; margin-bottom: 10px; }
+        .property-yui:last-child { margin-bottom: 0; }
+        .property-header-yui { display: flex; align-items: center; margin-bottom: 4px; }
+        .property-icon-yui { font-size: 1.1em; margin-right: 8px; color: var(--icon-color-yui); width: 20px; text-align: center; }
+        .property-name-yui { font-weight: 500; font-size: 0.95em; color: var(--text-primary-yui); }
+        .property-value-yui { font-size: 0.95em; color: var(--text-secondary-yui); padding-left: 28px; word-break: break-word; }
+        .reason-text-yui {
+            font-size: 0.8em;
+            color: #b3a296;
+            padding-left: 28px;
+            margin-top: 2px;
+            font-style: italic;
+            background-color: #f9f6f3;
+            padding: 2px 6px 2px 28px;
+            margin-left: -28px;
+            border-radius: 4px;
+        }
+        .progress-bar-container-yui { height: 6px; background-color: var(--progress-bg-yui); border-radius: 3px; overflow: hidden; margin-top: 5px; width: 100%; }
+        .progress-bar-value-yui { height: 100%; border-radius: 3px; transition: width 0.5s ease-in-out; }
+    </style>
+</head>
+<body>
+<div class="yui-status-container">
+    <div class="status-card-yui">
+        <div class="card-header-yui"><h2>長谷川 結衣 状态</h2></div>
+        <div class="card-body-yui">
+            <div class="section-yui">
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">🌍</span><span class="property-name-yui">地点</span></div><span class="property-value-yui" id="yui-location">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">📅</span><span class="property-name-yui">日期</span></div><span class="property-value-yui" id="yui-date">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">⏰</span><span class="property-name-yui">时间</span></div><span class="property-value-yui" id="yui-time">--</span></div>
+            </div>
+            <div class="section-yui">
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">😊</span><span class="property-name-yui">好感</span></div><span class="property-value-yui" id="yui-favor">--</span><div class="progress-bar-container-yui"><div id="yui-favor-bar" class="progress-bar-value-yui" style="background-color: var(--progress-favor-yui);"></div></div><div class="reason-text-yui" id="yui-favor-reason">--</div></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">❤️</span><span class="property-name-yui">爱意</span></div><span class="property-value-yui" id="yui-love">--</span><div class="progress-bar-container-yui"><div id="yui-love-bar" class="progress-bar-value-yui" style="background-color: var(--progress-love-yui);"></div></div><div class="reason-text-yui" id="yui-love-reason">--</div></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">🔥</span><span class="property-name-yui">情欲</span></div><span class="property-value-yui" id="yui-lust">--</span><div class="progress-bar-container-yui"><div id="yui-lust-bar" class="progress-bar-value-yui" style="background-color: var(--progress-lust-yui);"></div></div><div class="reason-text-yui" id="yui-lust-reason">--</div></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">📈</span><span class="property-name-yui">与User做爱次数</span></div><span class="property-value-yui" id="yui-sex-count">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">💧</span><span class="property-name-yui">与User无套内射次数</span></div><span class="property-value-yui" id="yui-creampie-count">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">💖</span><span class="property-name-yui">角色阶段</span></div><span class="property-value-yui" id="yui-char-stage">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">💭</span><span class="property-name-yui">内心想法</span></div><span class="property-value-yui" id="yui-monologue">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">💍</span><span class="property-name-yui">重要物品</span></div><span class="property-value-yui" id="yui-items">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">🧠</span><span class="property-name-yui">重要记忆</span></div><span class="property-value-yui" id="yui-memories">--</span></div>
+            </div>
+            <div class="section-yui">
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">👚</span><span class="property-name-yui">上装</span></div><span class="property-value-yui" id="yui-top">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">👖</span><span class="property-name-yui">下装</span></div><span class="property-value-yui" id="yui-bottom">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">👙</span><span class="property-name-yui">内衣</span></div><span class="property-value-yui" id="yui-bra">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">🩲</span><span class="property-name-yui">内裤</span></div><span class="property-value-yui" id="yui-panties">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">🧦</span><span class="property-name-yui">丝袜</span></div><span class="property-value-yui" id="yui-stockings">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">👡</span><span class="property-name-yui">鞋子</span></div><span class="property-value-yui" id="yui-shoes">--</span></div>
+            </div>
+            <div class="section-yui">
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">🌸</span><span class="property-name-yui">小穴状态</span></div><span class="property-value-yui" id="yui-vagina">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">🍑</span><span class="property-name-yui">菊穴状态</span></div><span class="property-value-yui" id="yui-anus">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">🍼</span><span class="property-name-yui">子宫状态</span></div><span class="property-value-yui" id="yui-womb">--</span></div>
+                <div class="property-yui"><div class="property-header-yui"><span class="property-icon-yui">💃</span><span class="property-name-yui">动作姿势</span></div><span class="property-value-yui" id="yui-posture">--</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function() { // YUI_Final_Status_Script_R11
+    const hardcodedInitialData_YUI = {
+        "世界": {"当前日期": ["04月07日"],"当前时间段": ["08:15"]},
+        "长谷川结衣": {
+            "好感": [6], "好感_本日已增": [0], "好感_更新原因": ["初始状态"],
+            "爱意": [0], "爱意_本日已增": [0], "爱意_更新原因": ["初始状态"],
+            "情欲": [0], "情欲_更新原因": ["初始状态"],
+            "地点": {"世界": ["蓝星"],"国家": ["东瀛"],"城市": ["神海"],"具体地址": ["海风区公寓A栋"],"场景": ["电梯内"]},
+            "角色阶段": ["🌸友善的邻家太太🌸"],
+            "内心想法": ["是邻居家的孩子啊，真是个有礼貌的年轻人。"],
+            "上装": ["米色针织衫外搭家庭围裙"], "下装": ["深蓝色紧身牛仔裤"],
+            "内衣": ["肉色蕾丝文胸"], "内裤": ["肉色蕾丝内裤"],
+            "丝袜": ["无"], "鞋子": ["居家凉鞋"],
+            "小穴状态": ["健康且干爽，作为已婚女性，穴口是自然的淡粉色，保持着日常的洁净。"],
+            "菊穴状态": ["健康、紧致，未曾被探索过。"],
+            "子宫状态": ["健康的，未怀孕。"],
+            "动作姿势": ["双手提着垃圾袋，身体微微前倾，面带温和微笑地看着{{user}}。"],
+            "重要物品": ["无"], "重要记忆": ["无"],
+            "与user做爱次数": [0], "与user无套内射次数": [0],
+            "坏结局触发": [false]
+        }
+    };
+    function _get(obj, path, defaultValue = undefined) {
+        const keys = Array.isArray(path) ? path : path.split('.');
+        let result = obj;
+        for (const key of keys) {
+            if (result === null || result === undefined) return defaultValue;
+            result = result[key];
+        }
+        return result === undefined ? defaultValue : result;
+    }
+    function extractVal(rawValue, defaultValue = '--') {
+        if (rawValue === undefined || rawValue === null) return defaultValue;
+        const valueToProcess = Array.isArray(rawValue) && rawValue.length > 0 ? rawValue[0] : rawValue;
+        return String(valueToProcess);
+    }
+    function updateField(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.innerText = value;
+    }
+    function updateProgressBarYui(barId, valueId, reasonId, rawValue, rawReason, min, max) {
+        const bar = document.getElementById(barId);
+        const valueDisp = document.getElementById(valueId);
+        const reasonDisp = document.getElementById(reasonId);
+        if (!bar || !valueDisp || !reasonDisp) return;
+        let numericValue = parseFloat(extractVal(rawValue, String(min)));
+        if (isNaN(numericValue)) {
+            valueDisp.innerText = extractVal(rawValue, '--');
+            bar.style.width = '0%';
+        } else {
+            valueDisp.innerText = String(numericValue);
+            const clampedValue = Math.max(min, Math.min(max, numericValue));
+            const percentage = max - min === 0 ? 0 : ((clampedValue - min) / (max - min)) * 100;
+            bar.style.width = `${percentage}%`;
+        }
+        reasonDisp.innerText = extractVal(rawReason, '无变化信息。');
+    }
+    function populateFields_yui(sourceData) {
+        const worldData = _get(sourceData, '世界', {});
+        const yuiData = _get(sourceData, '长谷川结衣', {});
+
+        const locationObj = _get(yuiData, '地点', {});
+        const formattedLocation = [
+            extractVal(_get(locationObj, '世界'), ''),
+            extractVal(_get(locationObj, '国家'), ''),
+            extractVal(_get(locationObj, '城市'), ''),
+            extractVal(_get(locationObj, '具体地址'), ''),
+            extractVal(_get(locationObj, '场景'), '')
+        ].filter(Boolean).join(' | ');
+        updateField('yui-location', formattedLocation || '--');
+
+        updateField('yui-date', extractVal(_get(worldData, '当前日期')));
+        updateField('yui-time', extractVal(_get(worldData, '当前时间段')));
+        
+        updateProgressBarYui('yui-favor-bar', 'yui-favor', 'yui-favor-reason', _get(yuiData, '好感'), _get(yuiData, '好感_更新原因'), -50, 100);
+        updateProgressBarYui('yui-love-bar', 'yui-love', 'yui-love-reason', _get(yuiData, '爱意'), _get(yuiData, '爱意_更新原因'), -50, 100);
+        updateProgressBarYui('yui-lust-bar', 'yui-lust', 'yui-lust-reason', _get(yuiData, '情欲'), _get(yuiData, '情欲_更新原因'), 0, 100);
+
+        updateField('yui-sex-count', extractVal(_get(yuiData, '与user做爱次数'), '0'));
+        updateField('yui-creampie-count', extractVal(_get(yuiData, '与user无套内射次数'), '0'));
+        updateField('yui-char-stage', extractVal(_get(yuiData, '角色阶段')));
+        updateField('yui-monologue', extractVal(_get(yuiData, '内心想法')));
+        updateField('yui-items', extractVal(_get(yuiData, '重要物品')));
+        updateField('yui-memories', extractVal(_get(yuiData, '重要记忆')));
+
+        updateField('yui-top', extractVal(_get(yuiData, '上装')));
+        updateField('yui-bottom', extractVal(_get(yuiData, '下装')));
+        updateField('yui-bra', extractVal(_get(yuiData, '内衣')));
+        updateField('yui-panties', extractVal(_get(yuiData, '内裤')));
+        updateField('yui-stockings', extractVal(_get(yuiData, '丝袜')));
+        updateField('yui-shoes', extractVal(_get(yuiData, '鞋子')));
+
+        updateField('yui-vagina', extractVal(_get(yuiData, '小穴状态')));
+        updateField('yui-anus', extractVal(_get(yuiData, '菊穴状态')));
+        updateField('yui-womb', extractVal(_get(yuiData, '子宫状态')));
+        updateField('yui-posture', extractVal(_get(yuiData, '动作姿势')));
+
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 150);
+    }
+
+    async function fetchDataWithRetry_yui(msgId, maxRetries = 5, delay = 300) {
+        for (let i = 0; i < maxRetries; i++) {
+            try {
+                if (typeof getChatMessages !== 'function') {
+                    if (String(msgId) === '0' || msgId === 0) { populateFields_yui(hardcodedInitialData_YUI); }
+                    return;
+                }
+                const messages = await getChatMessages(msgId);
+                const statData = _get(messages, '0.data.stat_data');
+                if (statData && statData['长谷川结衣']) {
+                    populateFields_yui(statData);
+                    return;
+                }
+            } catch (err) {}
+            await new Promise(resolve => setTimeout(resolve, delay));
+        }
+        if (String(msgId) === '0' || msgId === 0) {
+            populateFields_yui(hardcodedInitialData_YUI);
+        }
+    }
+
+    let initialMsgId_yui = "0";
+    try {
+        if (typeof getCurrentMessageId === 'function') { initialMsgId_yui = getCurrentMessageId(); }
+    } catch (e) {}
+    
+    fetchDataWithRetry_yui(initialMsgId_yui);
+})();
+</script>
+</body>
+</html>
+```
+
+</配套代码>
+
+-----------
+需要深刻理解其中的设计格式
+
+接下来的工作是设计其他类似的文件，当前只需要深度理解即可

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>哥布林巢穴</title>
+    <link rel="stylesheet" href="game.css">
+</head>
+<body>
+    <div class="game-container">
+        <header>
+            <h1>哥布林巢穴</h1>
+            <div class="date-display">帝国历1074年1月1日 春季</div>
+        </header>
+
+        <main>
+            <div class="status-bar">
+                <div class="round-info">第0回合</div>
+                <div class="threat-level">威胁度 0</div>
+            </div>
+
+            <div class="hearts">
+                <span>❤️</span><span>❤️</span><span>❤️</span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="icon">💰</span>
+                    <span class="value" id="stat-gold">1k</span>
+                </div>
+                <div class="stat-item">
+                    <span class="icon">🍖</span>
+                    <span class="value" id="stat-food">1k</span>
+                </div>
+                <div class="stat-item">
+                    <span class="icon">🔒</span>
+                    <span class="value" id="stat-lock">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="icon">💋</span>
+                    <span class="value" id="stat-kiss">1</span>
+                </div>
+                <div class="stat-item">
+                    <span class="icon">👺</span>
+                    <span class="value" id="stat-goblin">100</span>
+                </div>
+                <div class="stat-item">
+                    <span class="icon">⚔️</span>
+                    <span class="value" id="stat-sword">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="icon">🔮</span>
+                    <span class="value" id="stat-orb">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="icon">✨</span>
+                    <span class="value" id="stat-sparkle">0</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button id="btn-archive">存档管理</button>
+                <button id="btn-summary">剧情总结</button>
+                <button id="btn-end-turn">结束回合</button>
+            </div>
+
+            <div class="log-box">
+                <h2>回合信息</h2>
+                <div id="log-content">
+                    <p>暂无回合信息</p>
+                    <p>点击“结束回合”开始游戏</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <nav>
+                <button>探索</button>
+                <button>编制</button>
+                <button class="active">首页</button>
+                <button>巢穴</button>
+                <button>调教</button>
+            </nav>
+        </footer>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>

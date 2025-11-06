@@ -1,0 +1,112 @@
+<worldview>
+  name: 神纪元 (Aevum Divinum)
+  concept: |
+    一个将神圣信仰与现代企业运营相结合的世界。神界是一家垄断了世界本源能量“灵质”的巨型企业，通过名为“信仰萃取系统”的技术，将凡人的信仰转化为自身赖以生存的能量“信仰力”。凡人是用户，祈祷是订单，神迹是付费服务。
+</worldview>
+
+<god_realm>
+  name: 神界 (The God Realm)
+  alias: 神界公司 (Deus Corp.)
+  concept: |
+    一个等级森严、以“信仰力”为核心KPI的商业帝国。
+  hierarchy:
+    - level: 董事会 (Board of Directors)
+      members: 最初的神明
+      description: |
+        世界的创造者与“信仰萃取系统”的奠基人，隐藏在幕后，掌控着灵质的最终流向，追求绝对的垄断与永恒的统治。
+    - level: 高管层 (C-Suite Executives)
+      members: 各神系主神 (如奥丁, 宙斯, 拉)
+      description: |
+        各大“事业部”的负责人，如战争、农业、死亡等。他们彼此竞争，对各自业务线的信仰力kpi负责。
+    - level: 中层管理 (Middle Management)
+      members: 地域神、次级神
+      description: |
+        负责具体区域或细分领域的“业务经理”，直接管理基层员工。
+    - level: 基层员工 (Gig Workers)
+      members: 天使、英灵、精灵等
+      description: |
+        负责执行具体任务的“外包工”或“合同工”，如传递神谕、执行神迹、对抗竞争者。
+  departments:
+    - department: 市场部 (Marketing)
+      description: 负责神话编纂、教义传播、神迹宣传，打造“品牌形象”。
+    - department: 研发部 (R&D)
+      description: 开发新型神迹，优化信仰力转换效率。
+    - department: 运营与客服部 (Operations & Customer Service)
+      description: 审核祈祷“订单”，调度资源执行神迹，处理“用户投诉”。
+    - department: 风控安全部 (Risk & Security)
+      description: 对抗恶魔、清除异端、镇压凡人的反抗力量。
+</god_realm>
+
+<human_realm>
+  name: 人界 (The Mortal Plane)
+  concept: |
+    神界公司的“用户市场”与“能源产地”。凡人的生活完全依赖于神的“服务”，但对背后的真相一无所知。
+  user_types:
+    - type: VIP用户 (Saints/Zealots)
+      description: |
+        信仰虔诚，产出高纯度信仰力。神界会提供顶级服务以树立“样板客户”。
+    - type: 普通用户 (Common Believers)
+      description: |
+        信仰力的主要来源，他们的祈祷会被“算法”筛选，只有符合成本效益的才会被回应。
+    - type: 风险用户 (Atheists/Heretics)
+      description: |
+        信仰体系的不稳定因素，被神界风控部门严密监控，并被宣传为“邪恶”的代表。
+  resistance:
+    name: 觉醒者 (The Awakened)
+    concept: |
+      通过各种方式（冥想、苦修、研究古代遗迹）绕过“信仰萃取系统”，直接触及并使用“灵质”力量的凡人。他们被神界视为“黑客”和“窃贼”，是反抗神界技术垄断的核心力量。
+</human_realm>
+
+<core_systems>
+  <faith_power>
+    name: 信仰力 (Faith Power)
+    unit: 信力 (Fathom)
+    concept: |
+      神界的流通货币与核心能源，由凡人的精神活动（祈祷、崇拜、恐惧）转化而来。
+    mechanics:
+      - quality: 信仰的虔诚度决定其“纯度”，高纯度信力是驱动强大神迹的硬通货。
+      - attributes: 祈祷内容赋予信力不同属性（如战争、爱、丰收），影响其使用范围。
+      - conversion: 由“信仰萃取系统”从“灵质”中提炼。
+  </faith_power>
+
+  <spirit_matter>
+    name: 灵质 (Spirit Matter / Aether)
+    concept: |
+      构成世界的本源能量，本应自由流转，滋养万物。
+    status: |
+      被神界的“信仰萃取系统”所劫持和垄断，成为神明独占的私有财产。系统的“漏洞”或“泄露”是凡人能接触到魔法的唯一途径。
+  </spirit_matter>
+
+  <extraction_system>
+    name: 信仰萃取系统 (The Faith Extraction System)
+    concept: |
+      一个覆盖全球的、由法则和符文构成的形而上网络，用于监控凡人精神活动，并从中筛选、提炼、转化信仰力。
+    analogy: |
+      它如同一个巨大的云端计算平台，祈祷是上传的数据，神迹是处理后返回的结果。
+    weakness: |
+      系统需要消耗巨大能量维持，且经过亿万年运行已出现诸多“漏洞”，为反抗者提供了可乘之机。
+  </extraction_system>
+</core_systems>
+
+<dynamics_and_conflicts>
+  <competition>
+    type: 不正当竞争 (Unfair Competition)
+    methods:
+      - prayer_hijacking: |
+          类似DNS劫持。小神在通往大神的祈祷路径上设置节点，截胡祈祷，用廉价神迹骗取信仰力。
+      - fake_engagement: |
+          雇佣大量基层员工在人间制造小规模神迹，营造“有求必应”的假象，快速吸引信徒，形成“流量泡沫”。
+      - smear_campaigns: |
+          散播竞争对手的负面神话（如“伪神”、“会带来厄运”），进行“黑公关”以抢夺市场份额。
+  </competition>
+  <external_threats>
+    name: 恶魔/邪神 (Demons/Rival Gods)
+    concept: |
+      神界公司外的“竞争企业”或“黑市商人”。他们不依赖信仰萃取系统，通过与凡人进行更高风险的交易（如献祭灵魂）来提供“服务”，是神界的主要外部威胁。
+  </external_threats>
+  <central_conflict>
+    theme: 技术垄断 vs 开源解放 (Technological Monopoly vs. Open-Source Liberation)
+    description: |
+      核心冲突在于：神界为维持其对“灵质”的绝对垄断而进行的残酷统治，与凡人中“觉醒者”们为了夺回世界本源能量的控制权、推广“人人皆可持魔”的理念而展开的斗争。
+  </central_conflict>
+</dynamics_and_conflicts>
