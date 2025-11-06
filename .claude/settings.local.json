@@ -14,7 +14,8 @@
       "Bash(git mv:*)",
       "Bash(git reset:*)",
       "Bash(git remote add:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(git branch:*)"
     ],
     "deny": [],
     "ask": []
