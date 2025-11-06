@@ -459,28 +459,20 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         async sendToTavern(prompt, userInput) {
-            // 调试信息：检查环境
-            console.log('[酒馆检测] window.parent !== window:', window.parent !== window);
-            console.log('[酒馆检测] typeof TavernHelper:', typeof TavernHelper);
-            console.log('[酒馆检测] typeof SillyTavern:', typeof SillyTavern);
-            console.log('[酒馆检测] window对象:', window);
+            // 检查是否在iframe中
+            const inIframe = window.parent !== window;
 
-            // 检查是否在酒馆环境中且有TavernHelper API
-            const isInTavern = typeof window !== 'undefined' &&
-                             window.parent !== window &&
-                             (typeof TavernHelper !== 'undefined' || typeof SillyTavern !== 'undefined');
+            // 调试信息
+            console.log('[酒馆检测] 在iframe中:', inIframe);
+            console.log('[酒馆检测] window.parent可访问:', window.parent !== null);
 
-            if (isInTavern) {
-                this.logMessage('system', '✓ 检测到酒馆环境，使用真实AI通信');
-                // 使用TavernHelper API与酒馆通信
-                await this.sendViaTavernHelper(prompt, userInput);
+            if (inIframe) {
+                // 在iframe中，使用postMessage与酒馆通信
+                this.logMessage('system', '✓ 检测到iframe环境，使用postMessage通信');
+                await this.sendViaPostMessage(prompt, userInput);
             } else {
-                this.logMessage('system', '⚠ 未检测到酒馆环境，使用模拟模式');
-                console.log('[酒馆检测] 进入模拟模式的原因:');
-                console.log('  - 在iframe中:', window.parent !== window);
-                console.log('  - TavernHelper可用:', typeof TavernHelper !== 'undefined');
-                console.log('  - SillyTavern可用:', typeof SillyTavern !== 'undefined');
                 // 独立运行模式，模拟AI回复
+                this.logMessage('system', '⚠ 独立运行模式，使用模拟AI');
                 this.simulateAIResponse(userInput);
             }
         },
@@ -547,27 +539,51 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         },
 
-        // 旧的postMessage方法保留作为备用
-        sendViaPostMessage(prompt, userInput) {
-            const message = {
-                type: 'TAVERN_GAME_ACTION',
-                action: 'send_message',
-                data: {
+        // postMessage方法：直接在酒馆聊天框插入消息
+        async sendViaPostMessage(prompt, userInput) {
+            try {
+                console.log('[postMessage] 准备发送消息到酒馆');
+                console.log('[postMessage] 用户输入:', userInput);
+
+                // 构造消息对象
+                const message = {
+                    type: 'GAME_USER_INPUT',
+                    content: userInput,
                     prompt: prompt,
-                    userInput: userInput,
-                    gameState: this.state
+                    timestamp: new Date().toISOString()
+                };
+
+                // 发送到父窗口
+                window.parent.postMessage(message, '*');
+                console.log('[postMessage] 消息已发送到父窗口');
+
+                this.logMessage('system', '消息已发送，等待AI处理...');
+                this.logMessage('user', `你: ${userInput}`);
+
+                // 添加消息监听器（只添加一次）
+                if (!this._messageListenerAdded) {
+                    window.addEventListener('message', (event) => {
+                        console.log('[postMessage] 收到父窗口消息:', event.data);
+                        if (event.data && event.data.type === 'AI_RESPONSE') {
+                            console.log('[postMessage] 这是AI回复:', event.data.content);
+                            this.processAIResponse(event.data.content);
+                        }
+                    });
+                    this._messageListenerAdded = true;
+                    console.log('[postMessage] 消息监听器已添加');
                 }
-            };
 
-            // 发送消息到父窗口（酒馆）
-            window.parent.postMessage(message, '*');
+                // 10秒后如果没有回复，提示用户
+                setTimeout(() => {
+                    console.warn('[postMessage] 未收到酒馆回复，可能需要手动在酒馆中发送消息');
+                    this.logMessage('system', '提示：如未收到AI回复，请在酒馆聊天框中手动发送你的行动');
+                }, 10000);
 
-            this.logMessage('system', '已发送到AI，等待回复...');
-
-            // 监听AI回复
-            if (!this._messageListenerAdded) {
-                window.addEventListener('message', (event) => this.handleTavernResponse(event));
-                this._messageListenerAdded = true;
+            } catch (error) {
+                console.error('[postMessage] 发送失败:', error);
+                this.logMessage('system', `发送失败: ${error.message}`);
+                this.logMessage('system', '降级到模拟模式...');
+                this.simulateAIResponse(userInput);
             }
         },
 
