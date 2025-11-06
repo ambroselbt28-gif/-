@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         async loadGameData() {
             this.logMessage('system', '正在加载世界数据...');
             try {
-                const configPath = '../反派逆袭系统指南.yaml';
+                const configPath = './反派逆袭系统指南.yaml';
                 this.logMessage('system', `正在尝试加载配置文件: ${configPath}`);
 
                 const config = await this.loadYamlFile(configPath);
@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     for (const entry of config.character_book.entries) {
                         if (entry.enabled === false) continue;
 
-                        let filePath = `../${entry.content}`;
+                        let filePath = `./${entry.content}`;
                         this.logMessage('system', `正在加载 [${loadedCount + 1}/${totalEntries}]: ${entry.comment || entry.content}`);
 
                         // 检查文件是否存在并获取正确扩展名
@@ -459,81 +459,52 @@ document.addEventListener('DOMContentLoaded', () => {
         },
 
         async sendToTavern(prompt, userInput) {
-            // 调试信息：检查可用的API
-            console.log('[酒馆检测] 在iframe中:', window.parent !== window);
-            console.log('[酒馆检测] typeof TavernHelper:', typeof TavernHelper);
+            // 调试信息：检查 TavernHelper API（参考 GoblinGame 的实现）
+            console.log('[酒馆检测] 开始检测 TavernHelper API...');
             console.log('[酒馆检测] typeof window.TavernHelper:', typeof window.TavernHelper);
-            console.log('[酒馆检测] typeof parent.TavernHelper:', typeof parent?.TavernHelper);
 
-            // 尝试方法1：直接使用TavernHelper.generate（归墟Plus的方式）
-            if (typeof TavernHelper !== 'undefined' && TavernHelper.generate) {
-                this.logMessage('system', '✓ 检测到TavernHelper API，使用直接通信');
+            // ✅ 正确方式：直接从 window 访问（酒馆会全局注入到 iframe）
+            if (typeof window.TavernHelper !== 'undefined' && window.TavernHelper.generate) {
+                this.logMessage('system', '✓ 检测到 TavernHelper API，开始通信');
+                console.log('[酒馆检测] TavernHelper 可用方法:', Object.keys(window.TavernHelper));
                 await this.sendViaTavernHelper(prompt, userInput);
                 return;
             }
 
-            // 尝试方法2：从window获取
-            if (typeof window.TavernHelper !== 'undefined' && window.TavernHelper?.generate) {
-                this.logMessage('system', '✓ 从window获取TavernHelper');
-                window.TavernHelper = TavernHelper; // 设置全局引用
-                await this.sendViaTavernHelper(prompt, userInput);
-                return;
-            }
-
-            // 尝试方法3：从parent获取（iframe环境）
-            if (window.parent !== window) {
-                try {
-                    if (typeof parent.TavernHelper !== 'undefined' && parent.TavernHelper?.generate) {
-                        this.logMessage('system', '✓ 从父窗口获取TavernHelper');
-                        window.TavernHelper = parent.TavernHelper; // 复制引用
-                        await this.sendViaTavernHelper(prompt, userInput);
-                        return;
-                    }
-                } catch (e) {
-                    console.warn('[酒馆检测] 无法访问父窗口TavernHelper:', e);
-                }
-            }
-
-            // 所有方法都失败，降级到模拟模式
-            this.logMessage('system', '⚠ 未找到TavernHelper API，使用模拟模式');
+            // ❌ TavernHelper 未找到，降级到模拟模式
+            console.warn('[酒馆检测] TavernHelper 未找到，使用模拟模式');
+            console.warn('[酒馆检测] 提示：请确保游戏在 SillyTavern 的 iframe 中运行');
+            this.logMessage('system', '⚠ 当前为演示模式（TavernHelper 不可用）');
+            this.logMessage('system', '要使用完整功能，请在 SillyTavern 中通过 iframe 加载游戏');
             this.simulateAIResponse(userInput);
         },
 
         async sendViaTavernHelper(prompt, userInput) {
             try {
-                // 检查TavernHelper是否存在
-                if (typeof TavernHelper === 'undefined') {
-                    throw new Error('TavernHelper API未找到');
-                }
+                this.logMessage('system', '正在向 AI 发送请求...');
+                console.log('[TavernHelper] 发送提示词长度:', prompt.length);
 
-                this.logMessage('system', '正在向AI发送请求...');
-                console.log('[TavernHelper] 发送提示词:', prompt.substring(0, 100) + '...');
-
-                // 构建AI生成配置
+                // 使用 GoblinGame 的 API 调用方式
                 const generateConfig = {
-                    injects: [{
-                        role: 'user',
-                        content: prompt,
-                        position: 'in_chat',
-                        should_scan: true
-                    }],
-                    should_stream: false
+                    user_input: userInput,  // 用户输入
+                    should_stream: false    // 是否流式输出
                 };
 
-                console.log('[TavernHelper] 调用 TavernHelper.generate...');
-                // 调用TavernHelper.generate发送到AI
-                const aiResponse = await TavernHelper.generate(generateConfig);
-                console.log('[TavernHelper] 收到AI回复:', aiResponse?.substring(0, 100) + '...');
+                console.log('[TavernHelper] 调用 window.TavernHelper.generate()...');
+                // 调用 TavernHelper.generate 发送到 AI
+                const aiResponse = await window.TavernHelper.generate(generateConfig);
+                console.log('[TavernHelper] 收到 AI 回复，长度:', aiResponse?.length);
 
-                // 处理AI回复
+                if (!aiResponse) {
+                    throw new Error('AI 返回空响应');
+                }
+
+                // 处理 AI 回复
                 await this.processAIResponse(aiResponse);
-
-                // 将游戏状态同步到消息数据中（同层游玩机制）
-                await this.syncStateToMessages(aiResponse);
 
             } catch (error) {
                 console.error('[TavernHelper] 通信失败:', error);
-                this.logMessage('system', `错误: AI通信失败 - ${error.message}`);
+                this.logMessage('system', `错误: ${error.message}`);
                 this.logMessage('system', '正在降级到模拟模式...');
                 // 降级到模拟模式
                 this.simulateAIResponse(userInput);
