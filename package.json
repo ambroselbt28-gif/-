@@ -4,7 +4,8 @@
   "description": "反派逆袭系统 - 修仙世界的反派养成游戏",
   "main": "game.js",
   "scripts": {
-    "build": "node build-inline.js",
+    "build": "node build-loader.js",
+    "build:inline": "node build-inline.js",
     "build:webpack": "webpack --config webpack.config.js",
     "dev": "webpack serve --open --config webpack.config.js",
     "clean": "rimraf dist"
