@@ -1,3 +1,38 @@
+// ==================== 酒馆助手 API 注入 ====================
+// 从 parent 窗口获取 TavernHelper 和 SillyTavern（如果在 iframe 中）
+(function injectTavernAPIs() {
+    // 检查是否在 iframe 中
+    if (window.parent !== window) {
+        console.log('[酒馆 API 注入] 检测到 iframe 环境');
+
+        // 尝试从 parent 获取 TavernHelper
+        if (window.parent.TavernHelper) {
+            window.TavernHelper = window.parent.TavernHelper;
+            console.log('[酒馆 API 注入] ✅ 成功注入 TavernHelper');
+            console.log('[酒馆 API 注入] 可用方法:', Object.keys(window.TavernHelper));
+        } else {
+            console.warn('[酒馆 API 注入] ⚠️ parent.TavernHelper 未找到');
+        }
+
+        // 尝试从 parent 获取 SillyTavern
+        if (window.parent.SillyTavern) {
+            try {
+                window.SillyTavern = typeof window.parent.SillyTavern.getContext === 'function'
+                    ? window.parent.SillyTavern.getContext()
+                    : window.parent.SillyTavern;
+                console.log('[酒馆 API 注入] ✅ 成功注入 SillyTavern');
+            } catch (error) {
+                console.error('[酒馆 API 注入] ❌ 注入 SillyTavern 失败:', error);
+            }
+        } else {
+            console.warn('[酒馆 API 注入] ⚠️ parent.SillyTavern 未找到');
+        }
+    } else {
+        console.log('[酒馆 API 注入] 非 iframe 环境，使用演示模式');
+    }
+})();
+// ==================== API 注入完成 ====================
+
 document.addEventListener('DOMContentLoaded', () => {
 
     const game = {
